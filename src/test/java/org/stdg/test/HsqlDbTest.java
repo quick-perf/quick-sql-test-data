@@ -22,7 +22,6 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class HsqlDbTest {
 

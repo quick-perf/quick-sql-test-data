@@ -38,6 +38,10 @@ public class DatabaseMetadataFinderFactory {
             return new H2MetadataFinder(dataSource);
         }
 
+        if(dbType.equals(HSQLDB)) {
+            return new HsqlDbMetadataFinder(dataSource);
+        }
+
         return new DefaultDatabaseMetadataFinder(dataSource);
 
     }
