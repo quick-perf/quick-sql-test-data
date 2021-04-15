@@ -42,6 +42,10 @@ public class DatabaseMetadataFinderFactory {
             return new HsqlDbMetadataFinder(dataSource);
         }
 
+        if(dbType.equals(POSTGRE_SQL)) {
+            return new PostgreSqlMetadataFinder(dataSource);
+        }
+
         return new DefaultDatabaseMetadataFinder(dataSource);
 
     }
