@@ -21,7 +21,6 @@ import org.stdg.SqlTestDataGenerator;
 
 import java.util.Random;
 
-@Disabled
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class DatasetRowsMergingTest extends H2Configuration {
 

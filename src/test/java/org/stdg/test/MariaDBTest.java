@@ -143,51 +143,6 @@ public class MariaDBTest {
 
     }
 
-    @Disabled
-    @RepeatedTest(1) public void
-    should_order_insert_queries_following_table_dependencies() {
-
-        // GIVEN
-        TestTable teamTable =
-                        buildUniqueTable(DATA_SOURCE
-                                        , "Team"
-                                        ," id bigint not null" +
-                                        ",  name varchar(255)" +
-                                        ",  primary key (id)")
-                        .create()
-                        .insertValues("1, 'Manchester United'");
-
-        String playerTableConstraint = "add constraint player_team_fk" + generateRandomPositiveInt()
-                                     + " foreign key (team_id)"
-                                     + " references " + teamTable.getTableName() + " (id)";
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Player"
-                                , "id bigint not null"
-                                + ", firstName varchar(255)"
-                                + ", lastName varchar(255)"
-                                + ", team_id bigint"
-                                + ", primary key (id)")
-                        .create()
-                        .alter(playerTableConstraint)
-                        .insertValues("1, 'Paul', 'Pogba', 1");
-
-        // WHEN
-        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
-        String teamSelect = "SELECT * FROM " + teamTable.getTableName();
-        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
-        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(playerSelect, teamSelect);
-
-        // THEN
-        playerTable.drop();
-        teamTable.drop().create();
-        playerTable.create().alter(playerTableConstraint);
-       SQL_EXECUTOR.execute(insertStatements);
-        assertThat(playerTable).withGeneratedInserts(insertStatements).hasNumberOfRows(1);
-        assertThat(teamTable).hasNumberOfRows(1);
-
-    }
-
     private int generateRandomPositiveInt() {
         Random random = new Random();
         return Math.abs(random.nextInt());

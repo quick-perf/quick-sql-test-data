@@ -13,7 +13,10 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import org.stdg.SqlTestDataGenerator;
 
 import java.util.List;

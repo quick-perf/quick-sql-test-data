@@ -13,7 +13,6 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,6 @@ import java.util.List;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-@Disabled
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class DatasetRowApiTest extends H2Configuration {
 

@@ -23,7 +23,6 @@ import org.stdg.SqlTestDataGenerator;
 import javax.sql.DataSource;
 import java.util.Random;
 
-@Disabled
 @QuickPerfTest
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class JdbcRoundtripTest {
