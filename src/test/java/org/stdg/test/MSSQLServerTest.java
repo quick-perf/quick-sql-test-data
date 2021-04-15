@@ -25,7 +25,6 @@ import java.util.Random;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-@Disabled
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class MSSQLServerTest {
 

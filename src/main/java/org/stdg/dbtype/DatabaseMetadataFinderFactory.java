@@ -46,9 +46,12 @@ public class DatabaseMetadataFinderFactory {
             return new PostgreSqlMetadataFinder(dataSource);
         }
 
-        if (dbType.equals(MARIA_DB) || dbType.equals(MY_SQL)
-        ) {
+        if (dbType.equals(MARIA_DB) || dbType.equals(MY_SQL)) {
             return new MariaDBMySQLMetadataFinder(dataSource);
+        }
+
+        if(dbType.equals(MICROSOFT_SQL_SERVER)) {
+            return new MSSQLServerMetadataFinder(dataSource);
         }
 
         return new DefaultDatabaseMetadataFinder(dataSource);
