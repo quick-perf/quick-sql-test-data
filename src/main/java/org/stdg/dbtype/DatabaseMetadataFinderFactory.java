@@ -46,6 +46,11 @@ public class DatabaseMetadataFinderFactory {
             return new PostgreSqlMetadataFinder(dataSource);
         }
 
+        if (dbType.equals(MARIA_DB) || dbType.equals(MY_SQL)
+        ) {
+            return new MariaDBMySQLMetadataFinder(dataSource);
+        }
+
         return new DefaultDatabaseMetadataFinder(dataSource);
 
     }
