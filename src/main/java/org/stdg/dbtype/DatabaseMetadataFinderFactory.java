@@ -17,6 +17,8 @@ import org.stdg.DatabaseMetadataFinder;
 
 import javax.sql.DataSource;
 
+import static org.stdg.dbtype.DatabaseType.*;
+
 /**
  * Factory to create an instance of {@link org.stdg.DatabaseMetadataFinder}.
  */
@@ -31,6 +33,10 @@ public class DatabaseMetadataFinderFactory {
      * @return An instance of DatabaseMetadataFinder
      */
     public static DatabaseMetadataFinder createFrom(DataSource dataSource, DatabaseType dbType) {
+
+        if(dbType.equals(H2)) {
+            return new H2MetadataFinder(dataSource);
+        }
 
         return new DefaultDatabaseMetadataFinder(dataSource);
 

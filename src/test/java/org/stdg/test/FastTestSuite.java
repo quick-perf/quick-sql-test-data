@@ -23,6 +23,6 @@ import org.junit.runner.RunWith;
 @SelectClasses( {  H2Test.class
                  , DatasetRowApiTest.class
                  , DatasetRowsMergingTest.class
-                 , JdcRoundtripTest.class} )
+                 , JdbcRoundtripTest.class} )
 public class FastTestSuite {
 }

@@ -26,7 +26,7 @@ import java.util.Random;
 @Disabled
 @QuickPerfTest
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class JdcRoundtripTest {
+public class JdbcRoundtripTest {
 
     private static DataSource DATA_SOURCE;
 
