@@ -16,10 +16,10 @@ Writing datasets with SQL  may be tedious and time-consuming because of database
 *This Java library aims to ease the generation of datasets to test SQL queries. It produces INSERT statements taking account of integrity constraints.*
 
 The library automatically:
-* Identify *NOT NULL columns* and provide values by requesting the database
-* Add rows of dependent tables in case of *foreign key constraints*
-* Sort insert statements to accommodate  *foreign key constraints*
-* Sort insert statements following *primary key values*
+* identifies *NOT NULL columns* and provides values by requesting the database
+* adds rows of dependent tables in case of *foreign key constraints*
+* sorts insert statements to accommodate  *foreign key constraints*
+* sorts insert statements following *primary key values*
 
 ## How to use the library
 
@@ -48,9 +48,9 @@ _SQL test date generator_ works with:
 
 This library can be helpful in the two following situations.
 
-### Create a dataset before starting the writing of a SQL query
+### Create a dataset before starting the writing of an SQL query
 
-This case happens when you develop SQL queries with Test-Driven Development (TDD).
+This case happens when you develop SQL queries with *Test-Driven Development* (TDD).
 
 You can read below an example where we define a dataset row for which we generate the INSERT statement:
 ```java
