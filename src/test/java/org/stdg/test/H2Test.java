@@ -389,7 +389,7 @@ public class H2Test extends H2Configuration {
     }
 
     @RepeatedTest(9) public void
-    should_order_insert_following_the_primary_key_values() {
+    should_order_inserts_following_the_primary_key_values() {
 
         // GIVEN
         TestTable table =
@@ -426,6 +426,36 @@ public class H2Test extends H2Configuration {
 
         String fourthQuery = insertStatements.get(3);
         assertThat(fourthQuery).as(insertStatementsAsString).contains("VALUES(2, 2");
+
+    }
+
+    @RepeatedTest(9) public void
+    should_order_inserts_following_table_names_if_independent_tables() {
+
+        TestTable testTable1 =
+                TestTable.buildUniqueTable(DATA_SOURCE
+                                          , "TABLE_1"
+                                          , "col varchar(20)"
+                                          )
+                         .create()
+                         .insertValues("'value_col_tab1'");
+
+        TestTable testTable2 =
+                TestTable.buildUniqueTable(DATA_SOURCE
+                                          , "TABLE_2"
+                                          , "col varchar(20)"
+                                          )
+                        .create()
+                        .insertValues("'value_col_tab2'");
+
+        String tab1Select = "SELECT * FROM " + testTable1.getTableName();
+        String tab2Select = "SELECT * FROM " + testTable2.getTableName();
+
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(tab2Select, tab1Select);
+
+        assertThat(insertStatements.get(0)).contains(testTable1.getTableName());
+        assertThat(insertStatements.get(1)).contains(testTable2.getTableName());
 
     }
 

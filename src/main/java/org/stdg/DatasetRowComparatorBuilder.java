@@ -23,7 +23,9 @@ class DatasetRowComparatorBuilder {
     static Comparator<DatasetRow> buildFrom(DatabaseMetadataFinder databaseMetadataFinder) {
         ComparatorOnTableDependencies comparatorOnTableDependencies = new ComparatorOnTableDependencies(databaseMetadataFinder);
         ComparatorOnPrimaryKey comparatorOnPrimaryKey = new ComparatorOnPrimaryKey(databaseMetadataFinder);
-        return comparatorOnTableDependencies.thenComparing(comparatorOnPrimaryKey);
+        ComparatorOnTableName comparatorOnTableName = new ComparatorOnTableName();
+        return comparatorOnTableDependencies.thenComparing(comparatorOnPrimaryKey)
+                                            .thenComparing(comparatorOnTableName);
     }
 
     private static class ComparatorOnPrimaryKey implements Comparator<DatasetRow> {
@@ -98,4 +100,16 @@ class DatasetRowComparatorBuilder {
         }
 
     }
+
+    private static class ComparatorOnTableName implements Comparator<DatasetRow> {
+
+        @Override
+        public int compare(DatasetRow row1, DatasetRow row2) {
+            String row1TableName = row1.getTableName();
+            String row2TableName = row2.getTableName();
+            return row1TableName.compareTo(row2TableName);
+        }
+
+    }
+
 }
