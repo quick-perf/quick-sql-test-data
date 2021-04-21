@@ -125,7 +125,7 @@ public class HsqlDbTest {
     }
 
     @RepeatedTest(9) public void
-    should_order_insert_queries_following_table_dependencies() {
+    should_sort_insert_statements_following_table_dependencies() {
 
         // GIVEN
         TestTable teamTable =
@@ -220,7 +220,7 @@ public class HsqlDbTest {
     }
 
     @RepeatedTest(9) public void
-    should_order_insert_following_the_primary_key_values() {
+    should_sort_insert_statements_following_the_primary_key_values() {
 
         // GIVEN
         TestTable table =

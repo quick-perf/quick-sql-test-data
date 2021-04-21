@@ -194,7 +194,7 @@ public class MariaDBTest {
     }
 
     @RepeatedTest(9) public void
-    should_order_insert_following_the_primary_key_values() {
+    should_sort_insert_statements_following_the_primary_key_values() {
 
         // GIVEN
         TestTable table =
@@ -236,7 +236,7 @@ public class MariaDBTest {
     }
 
     @RepeatedTest(9) public void
-    should_order_insert_following_the_primary_key_values_with_a_composite_composite_primary_key_having_columns_not_in_same_order_as_in_table_declaration() {
+    should_sort_insert_statements_following_the_primary_key_values_with_a_composite_composite_primary_key_having_columns_not_in_same_order_as_in_table_declaration() {
 
         // GIVEN
         TestTable table =

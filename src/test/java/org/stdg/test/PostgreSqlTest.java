@@ -170,7 +170,7 @@ public class PostgreSqlTest {
     }
 
     @RepeatedTest(9) public void
-    should_order_insert_queries_following_table_dependencies() {
+    should_sort_insert_statements_following_table_dependencies() {
 
         // GIVEN
         TestTable teamTable =
@@ -268,7 +268,7 @@ public class PostgreSqlTest {
     }
 
     @RepeatedTest(9) public void
-    should_order_insert_following_primary_keys() {
+    should_sort_insert_statements_following_primary_keys() {
 
         // GIVEN
         TestTable table =

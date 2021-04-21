@@ -13,7 +13,10 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Test;
 import org.stdg.SqlTestDataGenerator;
 import org.testcontainers.containers.MariaDBContainer;
 
@@ -50,7 +53,7 @@ public class MariaDBSlowTest {
     }
 
     @Test public void
-    should_order_insert_queries_following_table_dependencies() {
+    should_sort_insert_statements_following_table_dependencies() {
 
         // GIVEN
         TestTable teamTable =
