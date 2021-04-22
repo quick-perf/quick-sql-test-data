@@ -216,6 +216,30 @@
                 </dependencies>
             </plugin>
              -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.0.rc1</version>
+                <configuration>
+                    <header>license-header.txt</header>
+                    <includes>
+                        <include>src/**</include>
+                    </includes>
+                    <properties>
+                        <project>${project.name}</project>
+                        <year>${project.inceptionYear}</year>
+                        <currentYear>${currentYear}</currentYear>
+                    </properties>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
