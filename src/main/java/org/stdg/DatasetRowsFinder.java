@@ -58,12 +58,7 @@ class DatasetRowsFinder {
                 String selectQuery = selectTransformer.transformToSelect();
                 return findDatasetRowsFrom(singletonList(new SqlQuery(selectQuery)));
             }
-                // else if(statement instanceof Delete){
-                // @TODO IMPLEMENT DELETE: tests + implementation
-                // Refactor to     List<DatasetRow> findDatasetRowsFrom(List<SqlQuery> sqlQueries) {
-                // by statement type
-                // commit
-                // }
+    
         }
 
         return datasetRowSet.sort();
