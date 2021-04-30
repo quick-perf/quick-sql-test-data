@@ -31,11 +31,11 @@ class SelectTransformer {
 
     private Update updateStatement;
 
-    SelectTransformer(Update update) {
+    public SelectTransformer(Update update) {
         updateStatement = update;
     }
 
-    String transformToSelect() {
+    public String transformToSelect() {
         String tableName = updateStatement.getTable().getName();
         return    "SELECT " + findSelectedColumnsSeparatedWithCommas()
                 + " FROM " + tableName
@@ -55,7 +55,7 @@ class SelectTransformer {
         return columnsToSelect;
     }
 
-    public List<String> findUpdatedColumnNames() {
+    private List<String> findUpdatedColumnNames() {
         return   updateStatement
                 .getColumns()
                 .stream()
@@ -69,7 +69,7 @@ class SelectTransformer {
                 :" WHERE " + whereExpression;
     }
 
-    public Collection<String> findWhereColumnNames() {
+    private Collection<String> findWhereColumnNames() {
         Expression whereExpression = updateStatement.getWhere();
         return findColumnNamesOf(whereExpression);
     }
@@ -106,7 +106,6 @@ class SelectTransformer {
 
         private String visitedColumnName;
 
-
         @Override
         public void visit(Column column) {
             this.visitedColumnName = column.getColumnName();
@@ -115,7 +114,6 @@ class SelectTransformer {
         String getVisitedColumnName() {
             return visitedColumnName;
         }
-
     }
 
 }

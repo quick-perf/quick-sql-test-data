@@ -16,13 +16,8 @@ package org.stdg.sqlparser;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.update.Update;
 
 public class SqlParser {
-
-    public static Update parseUpdateStatement(String insertQuery) {
-        return (Update) parseFrom(insertQuery);
-    }
 
     public static Statement parseFrom(String sqlQuery) {
         try {
