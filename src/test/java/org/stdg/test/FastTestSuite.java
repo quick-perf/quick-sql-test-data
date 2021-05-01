@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 @SuiteDisplayName("Fast tests")
 @SelectClasses( {  H2Test.class
                  , DatasetRowApiTest.class
+                 , UpdateTest.class
                  , SortInsertStatementsTest.class
                  , DatasetRowsMergingTest.class
                  , JdbcRoundtripTest.class} )

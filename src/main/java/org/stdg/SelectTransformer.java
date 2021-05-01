@@ -19,23 +19,19 @@ import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.update.Update;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
 class SelectTransformer {
 
-    private Update updateStatement;
+    private final Update updateStatement;
 
-    public SelectTransformer(Update update) {
+    SelectTransformer(Update update) {
         updateStatement = update;
     }
 
-    public String transformToSelect() {
+    String transformToSelect() {
         String tableName = updateStatement.getTable().getName();
         return    "SELECT " + findSelectedColumnsSeparatedWithCommas()
                 + " FROM " + tableName
@@ -102,7 +98,7 @@ class SelectTransformer {
         return leftRightColumnNames;
     }
 
-    static class ColumnExpressionVisitor extends ExpressionVisitorAdapter {
+    private static class ColumnExpressionVisitor extends ExpressionVisitorAdapter {
 
         private String visitedColumnName;
 

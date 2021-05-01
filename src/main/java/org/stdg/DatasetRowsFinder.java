@@ -16,17 +16,12 @@ package org.stdg;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.TablesNamesFinder;
-import org.stdg.sqlparser.SqlParser;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
-
-import static java.util.Collections.singletonList;
 
 class DatasetRowsFinder {
 
@@ -35,7 +30,7 @@ class DatasetRowsFinder {
     private final DatabaseMetadataFinder databaseMetadataFinder;
 
     DatasetRowsFinder(DataSource dataSource
-            , DatabaseMetadataFinder databaseMetadataFinder) {
+                    , DatabaseMetadataFinder databaseMetadataFinder) {
         this.dataSource = dataSource;
         this.databaseMetadataFinder = databaseMetadataFinder;
     }
@@ -45,20 +40,11 @@ class DatasetRowsFinder {
         DatasetRowSet datasetRowSet = new DatasetRowSet(dataSource, databaseMetadataFinder);
 
         for (SqlQuery sqlQuery : sqlQueries) {
-            Statement statement = SqlParser.parseFrom(sqlQuery.getQueryAsString());
-            if (statement instanceof Select) {
-                List<DatasetRow> datasetRowsForQuery = execute(sqlQuery);
-                for (DatasetRow datasetRow : datasetRowsForQuery) {
-                    datasetRowSet.add(datasetRow);
-                }
-            } else if (statement instanceof Update) {
-                Update update = (Update) statement;
-                SelectTransformer selectTransformer = new SelectTransformer(update);
-
-                String selectQuery = selectTransformer.transformToSelect();
-                return findDatasetRowsFrom(singletonList(new SqlQuery(selectQuery)));
+            SqlQuery selectQuery = sqlQuery.transformToSelectQuery();
+            List<DatasetRow> datasetRowsForQuery = execute(selectQuery);
+            for (DatasetRow datasetRow : datasetRowsForQuery) {
+                datasetRowSet.add(datasetRow);
             }
-    
         }
 
         return datasetRowSet.sort();

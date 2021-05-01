@@ -13,6 +13,12 @@
 
 package org.stdg;
 
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.update.Update;
+
 import java.util.*;
 
 import static java.util.stream.Collectors.joining;
@@ -20,7 +26,10 @@ import static java.util.stream.Collectors.joining;
 public class SqlQuery {
 
     private final String queryAsString;
+
     private final List<Object> parameters;
+
+    private static final SqlQuery NONE = new SqlQuery("");
 
     public SqlQuery(String queryAsString) {
         this.queryAsString = queryAsString;
@@ -30,6 +39,29 @@ public class SqlQuery {
     public SqlQuery(String queryAsString, List<Object> parameters) {
         this.queryAsString = queryAsString;
         this.parameters = parameters;
+    }
+
+    SqlQuery transformToSelectQuery() {
+        Statement parsedStatement = parse(queryAsString);
+        if(parsedStatement instanceof Select) {
+            return this;
+        }
+        if(parsedStatement instanceof Update) {
+            Update update = (Update) parsedStatement;
+            SelectTransformer selectTransformer = new SelectTransformer(update);
+            String selectQueryAsString = selectTransformer.transformToSelect();
+            return new SqlQuery(selectQueryAsString, parameters);
+        }
+        return NONE;
+    }
+
+   private Statement parse(String sqlQuery) {
+        try {
+            return CCJSqlParserUtil.parse(sqlQuery);
+        } catch (JSQLParserException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     static SqlQuery buildFromRow(DatasetRow rowToSearch) {
@@ -72,4 +104,5 @@ public class SqlQuery {
     List<Object> getParameters() {
         return parameters;
     }
+
 }
