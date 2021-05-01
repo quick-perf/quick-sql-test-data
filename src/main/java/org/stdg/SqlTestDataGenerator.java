@@ -38,10 +38,10 @@ import static java.util.stream.Collectors.toList;
  */
 public class SqlTestDataGenerator {
 
-    private final DatasetRowsFinder datasetRowsFinder;
+    private final DatasetRowsGenerator datasetRowsGenerator;
 
-    private SqlTestDataGenerator(DatasetRowsFinder datasetRowsFinder) {
-        this.datasetRowsFinder = datasetRowsFinder;
+    private SqlTestDataGenerator(DatasetRowsGenerator datasetRowsGenerator) {
+        this.datasetRowsGenerator = datasetRowsGenerator;
     }
 
     /**
@@ -59,8 +59,8 @@ public class SqlTestDataGenerator {
     }
 
     public static SqlTestDataGenerator buildFrom(DataSource dataSource, DatabaseMetadataFinder databaseMetadataFinder) {
-        DatasetRowsFinder datasetRowsFinder = new DatasetRowsFinder(dataSource, databaseMetadataFinder);
-        return new SqlTestDataGenerator(datasetRowsFinder);
+        DatasetRowsGenerator datasetRowsGenerator = new DatasetRowsGenerator(dataSource, databaseMetadataFinder);
+        return new SqlTestDataGenerator(datasetRowsGenerator);
     }
 
     public String generateInsertScriptFor(String sqlQuery) {
@@ -73,7 +73,7 @@ public class SqlTestDataGenerator {
     }
 
     public String generateInsertScriptFor(List<SqlQuery> sqlQueries) {
-        List<DatasetRow> datasetRows = datasetRowsFinder.findDatasetRowsFrom(sqlQueries);
+        List<DatasetRow> datasetRows = datasetRowsGenerator.generateDatasetRowsFor(sqlQueries);
         return InsertStatementsGenerator.INSTANCE.generateInsertScriptFor(datasetRows);
     }
 
@@ -93,7 +93,7 @@ public class SqlTestDataGenerator {
         List<SqlQuery> sqlQueryObjects = stream(sqlQueries)
                                         .map(SqlQuery::new)
                                         .collect(toList());
-        List<DatasetRow> datasetRows = datasetRowsFinder.findDatasetRowsFrom(sqlQueryObjects);
+        List<DatasetRow> datasetRows = datasetRowsGenerator.generateDatasetRowsFor(sqlQueryObjects);
         return InsertStatementsGenerator.INSTANCE.generateInsertStatementsFor(datasetRows);
     }
 

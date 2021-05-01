@@ -23,34 +23,23 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
 
+import static java.util.Collections.emptyList;
+
 class DatasetRowsFinder {
 
     private final DataSource dataSource;
 
-    private final DatabaseMetadataFinder databaseMetadataFinder;
-
-    DatasetRowsFinder(DataSource dataSource
-                    , DatabaseMetadataFinder databaseMetadataFinder) {
+    DatasetRowsFinder(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.databaseMetadataFinder = databaseMetadataFinder;
     }
 
-    List<DatasetRow> findDatasetRowsFrom(List<SqlQuery> sqlQueries) {
-        DatasetRowSet datasetRowSet = new DatasetRowSet(dataSource, databaseMetadataFinder);
-        for (SqlQuery sqlQuery : sqlQueries) {
-            Collection<DatasetRow> datasetRowsForQuery = findDatasetRowsOf(sqlQuery);
-            datasetRowSet.add(datasetRowsForQuery);
-        }
-        return datasetRowSet.sort();
-    }
-
-    private Collection<DatasetRow> findDatasetRowsOf(SqlQuery sqlQuery) {
+    Collection<DatasetRow> findDatasetRowsOf(SqlQuery sqlQuery) {
         Optional<SqlQuery> optionalSelectQuery = sqlQuery.transformToSelectQuery();
         if (optionalSelectQuery.isPresent()) {
             SqlQuery selectQuery = optionalSelectQuery.get();
             return execute(selectQuery);
         }
-        return Collections.emptyList();
+        return emptyList();
     }
 
     private Collection<DatasetRow> execute(SqlQuery sqlQuery) {
@@ -63,30 +52,12 @@ class DatasetRowsFinder {
             ResultSet resultSet = selectStatement.executeQuery();
 
             ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-
             int columnCount = resultSetMetaData.getColumnCount();
 
             while (resultSet.next()) {
-                Map<String, DatasetRow> rowByTableName = new HashMap<>();
-                for (int i = 1; i <= columnCount; i++) {
-
-                    String tableName = findTableName(sqlQuery, resultSetMetaData, i);
-
-                    String column = resultSetMetaData.getColumnName(i);
-                    Object value = resultSet.getObject(i);
-
-                    DatasetRow datasetRow = rowByTableName.computeIfAbsent(tableName
-                                                                         , t -> DatasetRow.ofTable(tableName));
-                    datasetRow.addColumnValue(column, value);
-
-                }
-
-                Set<Map.Entry<String, DatasetRow>> tableNameEntries = rowByTableName.entrySet();
-
-                for (Map.Entry<String, DatasetRow> tableNameEntry : tableNameEntries) {
-                    DatasetRow datasetRow = tableNameEntry.getValue();
-                    datasetRowsToReturn.add(datasetRow);
-                }
+                Collection<DatasetRow> datasetRows =
+                        buildDatasetRowsFrom(resultSet, resultSetMetaData, columnCount, sqlQuery);
+                datasetRowsToReturn.addAll(datasetRows);
             }
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -96,14 +67,29 @@ class DatasetRowsFinder {
 
     }
 
-    private String findTableName(SqlQuery sqlQuery, ResultSetMetaData resultSetMetaData, int i) throws SQLException {
-        String tableName = resultSetMetaData.getTableName(i);
+    private Collection<DatasetRow> buildDatasetRowsFrom(ResultSet resultSet, ResultSetMetaData resultSetMetaData
+                                                      , int columnCount, SqlQuery sqlQuery) throws SQLException {
+        Map<String, DatasetRow> rowsByTableName = new HashMap<>();
+        for (int colIndex = 1; colIndex <= columnCount; colIndex++) {
+            final String tableName = findTableName(resultSetMetaData, colIndex, sqlQuery);
+            DatasetRow datasetRow =
+                    rowsByTableName.computeIfAbsent(tableName
+                                                  , t -> DatasetRow.ofTable(tableName));
 
-        if(tableName.isEmpty()) {
-            String queryAsString = sqlQuery.getQueryAsString();
-            tableName = extractTableNameFrom(queryAsString);
+            String column = resultSetMetaData.getColumnName(colIndex);
+            Object value = resultSet.getObject(colIndex);
+            datasetRow.addColumnValue(column, value);
         }
-        return tableName;
+        return rowsByTableName.values();
+    }
+
+    private String findTableName(ResultSetMetaData resultSetMetaData, int colIndex, SqlQuery sqlQuery) throws SQLException {
+        String tableName = resultSetMetaData.getTableName(colIndex);
+        if (!tableName.isEmpty()) {
+            return tableName;
+        }
+        String queryAsString = sqlQuery.getQueryAsString();
+        return extractTableNameFrom(queryAsString);
     }
 
     private String extractTableNameFrom(String sqlQueryAsString) {
