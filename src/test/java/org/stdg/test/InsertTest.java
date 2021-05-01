@@ -13,21 +13,47 @@
 
 package org.stdg.test;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.quickperf.junit5.QuickPerfTest;
+import org.quickperf.sql.annotation.ExpectJdbcQueryExecution;
 import org.stdg.SqlTestDataGenerator;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.sql.DataSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.quickperf.sql.config.QuickPerfSqlDataSourceBuilder.aDataSourceBuilder;
+
+@QuickPerfTest
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class InsertTest extends H2Configuration {
+public class InsertTest {
+
+    static DataSource DATA_SOURCE;
+
+    static SqlExecutor SQL_EXECUTOR;
+
+    @BeforeAll
+    public static void beforeAll() {
+        DataSource h2Datasource = DataSourceBuilder.build("jdbc:h2:mem:test", "user", "pwd");
+        DATA_SOURCE = aDataSourceBuilder().buildProxy(h2Datasource);
+        SQL_EXECUTOR = new SqlExecutor(DATA_SOURCE);
+    }
 
     @Test public void
     should_generate_an_empty_insert_script_for_an_insert_input() {
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
-        String insertScript = sqlTestDataGenerator.generateInsertScriptFor("INSERT INTO A_TABLE VALUES(1, 2, 3)");
+        String anInsertStatement = "INSERT INTO A_TABLE VALUES(1, 2, 3)";
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(anInsertStatement);
         assertThat(insertScript).isEmpty();
+    }
+
+    @Test @ExpectJdbcQueryExecution(0) public void
+    should_not_use_jdbc_execution_for_an_insert_input() {
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String anInsertStatement = "INSERT INTO A_TABLE VALUES(1, 2, 3)";
+        sqlTestDataGenerator.generateInsertScriptFor(anInsertStatement);
     }
 
 }

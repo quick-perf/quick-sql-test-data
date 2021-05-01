@@ -29,7 +29,13 @@ class DatasetRowSet {
         this.missingNotNullColumnsFinder = new MissingNotNullColumnsFinder(dataSource, databaseMetadataFinder);
     }
 
-    void add(DatasetRow datasetRow) {
+    void add(Collection<DatasetRow> datasetRows) {
+        for (DatasetRow datasetRow : datasetRows) {
+            add(datasetRow);
+        }
+    }
+
+    private void add(DatasetRow datasetRow) {
 
         boolean rowIsMerged = datasetRow.mergeWithARowOf(datasetRows);
 

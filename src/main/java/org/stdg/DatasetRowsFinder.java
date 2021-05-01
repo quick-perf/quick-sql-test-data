@@ -36,22 +36,24 @@ class DatasetRowsFinder {
     }
 
     List<DatasetRow> findDatasetRowsFrom(List<SqlQuery> sqlQueries) {
-
         DatasetRowSet datasetRowSet = new DatasetRowSet(dataSource, databaseMetadataFinder);
-
         for (SqlQuery sqlQuery : sqlQueries) {
-            SqlQuery selectQuery = sqlQuery.transformToSelectQuery();
-            List<DatasetRow> datasetRowsForQuery = execute(selectQuery);
-            for (DatasetRow datasetRow : datasetRowsForQuery) {
-                datasetRowSet.add(datasetRow);
-            }
+            Collection<DatasetRow> datasetRowsForQuery = findDatasetRowsOf(sqlQuery);
+            datasetRowSet.add(datasetRowsForQuery);
         }
-
         return datasetRowSet.sort();
-
     }
 
-    private List<DatasetRow> execute(SqlQuery sqlQuery) {
+    private Collection<DatasetRow> findDatasetRowsOf(SqlQuery sqlQuery) {
+        Optional<SqlQuery> optionalSelectQuery = sqlQuery.transformToSelectQuery();
+        if (optionalSelectQuery.isPresent()) {
+            SqlQuery selectQuery = optionalSelectQuery.get();
+            return execute(selectQuery);
+        }
+        return Collections.emptyList();
+    }
+
+    private Collection<DatasetRow> execute(SqlQuery sqlQuery) {
 
         List<DatasetRow> datasetRowsToReturn = new ArrayList<>();
 

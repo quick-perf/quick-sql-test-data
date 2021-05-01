@@ -29,8 +29,6 @@ public class SqlQuery {
 
     private final List<Object> parameters;
 
-    private static final SqlQuery NONE = new SqlQuery("");
-
     public SqlQuery(String queryAsString) {
         this.queryAsString = queryAsString;
         this.parameters = Collections.emptyList();
@@ -41,18 +39,19 @@ public class SqlQuery {
         this.parameters = parameters;
     }
 
-    SqlQuery transformToSelectQuery() {
+    Optional<SqlQuery> transformToSelectQuery() {
         Statement parsedStatement = parse(queryAsString);
         if(parsedStatement instanceof Select) {
-            return this;
+            return Optional.of(this);
         }
         if(parsedStatement instanceof Update) {
             Update update = (Update) parsedStatement;
             SelectTransformer selectTransformer = new SelectTransformer(update);
             String selectQueryAsString = selectTransformer.transformToSelect();
-            return new SqlQuery(selectQueryAsString, parameters);
+            SqlQuery sqlQuery = new SqlQuery(selectQueryAsString, parameters);
+            return Optional.of(sqlQuery);
         }
-        return NONE;
+        return Optional.empty();
     }
 
    private Statement parse(String sqlQuery) {
