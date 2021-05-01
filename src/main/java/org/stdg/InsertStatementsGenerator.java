@@ -16,8 +16,8 @@ package org.stdg;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 
+import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -31,7 +31,8 @@ class InsertStatementsGenerator {
         return   datasetRows
                 .stream()
                 .map(this::generateInsertStatementFrom)
-                .collect(joiningScriptLines()) + ";";
+                .map(insertStatement -> insertStatement + ";" + lineSeparator())
+                .collect(joining());
     }
 
     private String generateInsertStatementFrom(DatasetRow datasetRow) {
@@ -40,10 +41,6 @@ class InsertStatementsGenerator {
         Collection<Object> columnValues = datasetRow.getColumnValues();
         return  "INSERT INTO " + tableName + "(" + formatColumnNames(columnNames) + ")"
               + " VALUES(" + formatColumnValues(columnValues) + ")";
-    }
-
-    private Collector<CharSequence, ?, String> joiningScriptLines() {
-        return joining(";" + System.lineSeparator());
     }
 
     private String formatColumnNames(Set<String> columnNames) {
