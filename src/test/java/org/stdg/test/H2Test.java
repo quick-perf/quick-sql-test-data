@@ -18,6 +18,8 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.stdg.SqlTestDataGenerator;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +55,40 @@ public class H2Test extends H2Configuration {
         TestTable.TestTableAssert.assertThat(playerTable).row(0).column(0).hasValues(1, 2);
         TestTable.TestTableAssert.assertThat(playerTable).row(0).column(1).hasValues("Paul", "Antoine");
         TestTable.TestTableAssert.assertThat(playerTable).row(0).column(2).hasValues("Pogba", "Griezmann");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_from_a_select_containing_bind_parameters() {
+
+        // GIVEN
+        TestTable table =
+                TestTable.buildUniqueTable(DATA_SOURCE
+                                          , "Table"
+                                          , "col1 varchar(25)"
+                                          + ", col2 varchar(25)"
+                                          + ", col3 varchar(25)"
+                                          )
+                        .create()
+                        .insertValues("'val1', 'val2', 'val3'");
+
+        String tableName = table.getTableName();
+        String select = " SELECT col1, col2, col3 FROM " + tableName
+                      + " WHERE col2=? AND col3=?";
+
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+
+        // WHEN
+        List<Object> parameterValues = Arrays.asList("val2", "val3");
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select, parameterValues);
+
+        // THEN
+        table.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        TestTable.TestTableAssert.assertThat(table)
+                                 .withScript(insertScript)
+                                 .hasNumberOfRows(1)
+                                 .row(0).hasValues("val1", "val2", "val3");
 
     }
 
