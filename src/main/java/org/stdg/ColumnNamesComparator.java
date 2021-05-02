@@ -20,29 +20,37 @@ import java.util.Map;
 
 class ColumnNamesComparator implements Comparator<String> {
 
-    private final Map<String, Integer> indexByColumnName;
+    private final Map<String, Integer> positionByColumnName;
 
-    private ColumnNamesComparator(Map<String, Integer> indexByColumnName) {
-        this.indexByColumnName = indexByColumnName;
+    private ColumnNamesComparator(Map<String, Integer> positionByColumnName) {
+        this.positionByColumnName = positionByColumnName;
     }
 
     public static ColumnNamesComparator from(List<String> orderedColumns) {
-        Map<String, Integer> indexByColumnName = buildIndexByColumnName(orderedColumns);
-        return new ColumnNamesComparator(indexByColumnName);
+        Map<String, Integer> positionByColumnName = buildIndexByColumnName(orderedColumns);
+        return new ColumnNamesComparator(positionByColumnName);
     }
 
     private static Map<String, Integer> buildIndexByColumnName(List<String> orderedColumns) {
-        final Map<String, Integer> indexByColumnName = new HashMap<>();
+        final Map<String, Integer> positionByColumnName = new HashMap<>();
         for (int i = 0; i < orderedColumns.size(); i++) {
-            indexByColumnName.put(orderedColumns.get(i), i + 1);
+            positionByColumnName.put(orderedColumns.get(i), i + 1);
         }
-        return indexByColumnName;
+        return positionByColumnName;
     }
 
     @Override
     public int compare(String colName1, String colName2) {
-        return    indexByColumnName.get(colName1)
-                - indexByColumnName.get(colName2);
+        return findPositionOf(colName1) - findPositionOf(colName2);
+    }
+
+    private int findPositionOf(String colName1) {
+        Integer position = positionByColumnName.get(colName1);
+        boolean otherDbTypeOrDbTableHasChangedWithLessOrMoreColumns = position == null;
+        if(otherDbTypeOrDbTableHasChangedWithLessOrMoreColumns) {
+            return 0;
+        }
+        return position;
     }
 
 }

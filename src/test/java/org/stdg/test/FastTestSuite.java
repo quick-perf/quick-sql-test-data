@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 @RunWith(JUnitPlatform.class)
 @SuiteDisplayName("Fast tests")
 @SelectClasses( {  H2Test.class
+                 , NotFullyManagedDatabaseTest.class
                  , DatasetRowApiTest.class
                  , UpdateTest.class
                  , InsertTest.class

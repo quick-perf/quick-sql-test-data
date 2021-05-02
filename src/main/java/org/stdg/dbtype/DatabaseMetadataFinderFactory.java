@@ -32,7 +32,7 @@ public class DatabaseMetadataFinderFactory {
      * @param dbType A database type
      * @return An instance of DatabaseMetadataFinder
      */
-    public static DatabaseMetadataFinder createFrom(DataSource dataSource, DatabaseType dbType) {
+    public static DatabaseMetadataFinder createDatabaseMetadataFinderFrom(DataSource dataSource, DatabaseType dbType) {
 
         if(dbType.equals(H2)) {
             return new H2MetadataFinder(dataSource);

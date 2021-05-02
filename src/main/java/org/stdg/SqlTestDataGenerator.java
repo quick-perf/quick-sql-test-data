@@ -53,7 +53,7 @@ public class SqlTestDataGenerator {
     public static SqlTestDataGenerator buildFrom(DataSource dataSource) {
         String dbUrl = DatabaseUrlFinder.INSTANCE.findDbUrlFrom(dataSource);
         DatabaseType dbType = DatabaseType.findFromDbUrl(dbUrl);
-        DatabaseMetadataFinder databaseMetadataFinder = DatabaseMetadataFinderFactory.createFrom(dataSource, dbType);
+        DatabaseMetadataFinder databaseMetadataFinder = DatabaseMetadataFinderFactory.createDatabaseMetadataFinderFrom(dataSource, dbType);
         DatabaseMetadataFinder databaseMetadataFinderWithCache = DatabaseMetadataFinderWithCache.buildFrom(databaseMetadataFinder);
         return buildFrom(dataSource, databaseMetadataFinderWithCache);
     }
