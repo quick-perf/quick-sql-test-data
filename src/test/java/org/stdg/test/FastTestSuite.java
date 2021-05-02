@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 @SelectClasses( {  H2Test.class
                  , NotFullyManagedDatabaseTest.class
                  , DatasetRowApiTest.class
+                 , SelectTest.class
                  , UpdateTest.class
                  , InsertTest.class
                  , SortInsertStatementsTest.class

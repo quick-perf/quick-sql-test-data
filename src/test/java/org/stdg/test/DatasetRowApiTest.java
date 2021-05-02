@@ -13,8 +13,6 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.stdg.DatasetRow;
 import org.stdg.SqlTestDataGenerator;
@@ -24,11 +22,9 @@ import java.util.List;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class DatasetRowApiTest extends H2Configuration {
 
-    @Test
-    public void
+    @Test public void
     should_generate_working_insert_from_a_dataset_row() {
 
         // GIVEN
@@ -54,10 +50,9 @@ public class DatasetRowApiTest extends H2Configuration {
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertStatements);
-        assertThat(playerTable).withGeneratedInserts(insertStatements).hasNumberOfRows(1);
-        assertThat(playerTable).row(0).column(0).hasValues(1);
-        assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba");
 
     }
 

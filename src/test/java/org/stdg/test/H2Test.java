@@ -13,91 +13,23 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.stdg.SqlTestDataGenerator;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.stdg.test.TestTable.*;
+import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class H2Test extends H2Configuration {
-
-    @Test public void
-    should_generate_working_insert_from_a_select_statement() {
-
-        // GIVEN
-        TestTable playerTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Player"
-                                          , "  id bigint"
-                                          + ", firstName varchar(255)"
-                                          + ", lastName varchar(255)"
-                                          )
-                .create()
-                .insertValues("1, 'Paul', 'Pogba'")
-                .insertValues("2, 'Antoine', 'Griezmann'");
-
-        // WHEN
-        String playerTableName = playerTable.getTableName();
-        String select = "SELECT * FROM " + playerTableName;
-        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
-        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
-
-        // THEN
-        playerTable.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(2);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(0).hasValues(1, 2);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(1).hasValues("Paul", "Antoine");
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(2).hasValues("Pogba", "Griezmann");
-
-    }
-
-    @Test public void
-    should_generate_an_insert_statement_from_a_select_containing_bind_parameters() {
-
-        // GIVEN
-        TestTable table =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Table"
-                                          , "col1 varchar(25)"
-                                          + ", col2 varchar(25)"
-                                          + ", col3 varchar(25)"
-                                          )
-                        .create()
-                        .insertValues("'val1', 'val2', 'val3'");
-
-        String tableName = table.getTableName();
-        String select = " SELECT col1, col2, col3 FROM " + tableName
-                      + " WHERE col2=? AND col3=?";
-
-        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
-
-        // WHEN
-        List<Object> parameterValues = Arrays.asList("val2", "val3");
-        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select, parameterValues);
-
-        // THEN
-        table.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(table)
-                                 .withScript(insertScript)
-                                 .hasNumberOfRows(1)
-                                 .row(0).hasValues("val1", "val2", "val3");
-
-    }
 
     @Test public void
     should_generate_an_insert_statement_with_columns_declared_in_the_same_order_as_in_the_table() {
 
         // GIVEN
         TestTable playerTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
+                buildUniqueTable(DATA_SOURCE
                                           , "player"
                                           , "id bigint"
                                           + ", firstName varchar(255)"
@@ -106,9 +38,10 @@ public class H2Test extends H2Configuration {
                 .create()
                 .insertValues("1, 'Paul', 'Pogba'");
 
-        // WHEN
         String playerTableName = playerTable.getTableName();
         String select = "SELECT * FROM " + playerTableName;
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
 
@@ -117,7 +50,8 @@ public class H2Test extends H2Configuration {
 
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).hasNumberOfRows(1);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
 
     }
 
@@ -126,28 +60,28 @@ public class H2Test extends H2Configuration {
 
         // GIVEN
         TestTable playerTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Player"
-                                          , "  id bigint not null"
-                                          + ", firstName varchar(255) not null"
-                                          + ", lastName varchar(255) not null"
-                                          )
+                buildUniqueTable(DATA_SOURCE
+                                , "Player"
+                                , "  id bigint not null"
+                                + ", firstName varchar(255) not null"
+                                + ", lastName varchar(255) not null"
+                                )
                 .create()
                 .insertValues("1, 'Paul', 'Pogba'");
 
-        // WHEN
         String playerTableName = playerTable.getTableName();
         String select = "SELECT id FROM " + playerTableName + " WHERE lastName = 'Pogba'";
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
 
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(0).hasValues(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba");
 
     }
 
@@ -156,29 +90,29 @@ public class H2Test extends H2Configuration {
 
         // GIVEN
         TestTable playerTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Player"
-                                          , "  id bigint not null"
-                                          + ", firstName varchar(255) not null"
-                                          + ", lastName varchar(255) not null"
-                                          + ", team_id bigint"
-                                          )
+                buildUniqueTable(DATA_SOURCE
+                                , "Player"
+                                , "  id bigint not null"
+                                + ", firstName varchar(255) not null"
+                                + ", lastName varchar(255) not null"
+                                + ", team_id bigint"
+                                )
                 .create()
                 .insertValues("1, 'Paul', 'Pogba', NULL");
 
-        // WHEN
         String playerTableName = playerTable.getTableName();
         String select = "SELECT team_id FROM " + playerTableName + " WHERE lastName = 'Pogba'";
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
 
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(0).hasValues(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba", null);
 
     }
 
@@ -187,7 +121,7 @@ public class H2Test extends H2Configuration {
 
         // GIVEN
         TestTable playerTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
+                buildUniqueTable(DATA_SOURCE
                                           , "Player"
                                           , "  id bigint not null"
                                           + ", firstName varchar(255) not null"
@@ -206,10 +140,9 @@ public class H2Test extends H2Configuration {
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(0).hasValues(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba", null);
 
     }
 
@@ -223,33 +156,34 @@ public class H2Test extends H2Configuration {
 
         // GIVEN
         TestTable teamTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Team"
-                                          ," id bigint not null" +
-                                           ",  name varchar(255)" +
-                                           ",  primary key (id)"
-                                          )
-                        .create()
-                        .insertValues("1, 'Manchester United'");
+                buildUniqueTable(DATA_SOURCE
+                                , "Team"
+                                ," id bigint not null" +
+                                ",  name varchar(255)" +
+                                ",  primary key (id)"
+                               )
+               .create()
+               .insertValues("1, 'Manchester United'");
 
         String playerTableConstraint = "add constraint player_team_fk" + generateRandomPositiveInt()
                                      + " foreign key (team_id)"
                                      + " references " + teamTable.getTableName();
         TestTable playerTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Player"
-                                          , "id bigint not null"
-                                          + ", firstName varchar(255)"
-                                          + ", lastName varchar(255)"
-                                          + ", team_id bigint not null"
-                                          + ", primary key (id)"
-                                          )
-                        .create()
-                        .alter(playerTableConstraint)
-                        .insertValues("1, 'Paul', 'Pogba', 1");
+                buildUniqueTable(DATA_SOURCE
+                                , "Player"
+                                , "id bigint not null"
+                                + ", firstName varchar(255)"
+                                + ", lastName varchar(255)"
+                                + ", team_id bigint not null"
+                                + ", primary key (id)"
+                                )
+                .create()
+                .alter(playerTableConstraint)
+                .insertValues("1, 'Paul', 'Pogba', 1");
+
+        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
 
         // WHEN
-        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(playerSelect);
 
@@ -258,8 +192,10 @@ public class H2Test extends H2Configuration {
         teamTable.drop().create();
         playerTable.create().alter(playerTableConstraint);
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(teamTable).hasNumberOfRows(1);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).withScript(insertScript)
+                             .hasNumberOfRows(1);
 
     }
 
@@ -268,32 +204,33 @@ public class H2Test extends H2Configuration {
 
         // GIVEN
         TestTable teamTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Team"
-                                          ," id bigint not null" +
-                                          ",  name varchar(255) not null" +
-                                          ",  primary key (id)")
-                        .create()
-                        .insertValues("1, 'Manchester United'");
+                buildUniqueTable(DATA_SOURCE
+                                , "Team"
+                                ," id bigint not null" +
+                                 ",  name varchar(255) not null" +
+                                 ",  primary key (id)")
+                .create()
+                .insertValues("1, 'Manchester United'");
 
         String playerTableConstraint = "add constraint player_team_fk" + generateRandomPositiveInt()
                                      + " foreign key (team_id)"
                                      + " references " + teamTable.getTableName();
         TestTable playerTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Player"
-                                          , "id bigint not null"
-                                          + ", firstName varchar(255)"
-                                          + ", lastName varchar(255)"
-                                          + ", team_id bigint not null"
-                                          + ", primary key (id)"
-                                          )
-                        .create()
-                        .alter(playerTableConstraint)
-                        .insertValues("1, 'Paul', 'Pogba', 1");
+                buildUniqueTable(DATA_SOURCE
+                                 , "Player"
+                                 , "id bigint not null"
+                                 + ", firstName varchar(255)"
+                                 + ", lastName varchar(255)"
+                                 + ", team_id bigint not null"
+                                 + ", primary key (id)"
+                                 )
+                .create()
+                .alter(playerTableConstraint)
+                .insertValues("1, 'Paul', 'Pogba', 1");
+
+        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
 
         // WHEN
-        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(playerSelect);
 
@@ -302,10 +239,11 @@ public class H2Test extends H2Configuration {
         teamTable.drop().create();
         playerTable.create().alter(playerTableConstraint);
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(teamTable).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(teamTable).row(0).column(0).hasValues(1);
-        TestTable.TestTableAssert.assertThat(teamTable).row(0).column(1).hasValues("Manchester United");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).hasNumberOfRows(1)
+                             .row(0).column(0).hasValues(1)
+                             .row(0).column(1).hasValues("Manchester United");
 
     }
 
@@ -314,48 +252,49 @@ public class H2Test extends H2Configuration {
 
         // GIVEN
         TestTable sponsorTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
+                buildUniqueTable(DATA_SOURCE
                                           , "Sponsor"
                                           , "  id bigint" +
                                           ",  name varchar(255) not null" +
                                           ", primary key (id)"
                                           )
-                        .create()
-                        .insertValues("1, 'Sponsor name'");
+                .create()
+                .insertValues("1, 'Sponsor name'");
 
         String teamSponsorForeignKey = "add constraint team_sponsor_fk" + generateRandomPositiveInt()
                                      + " foreign key (sponsor_id)"
                                      + " references " + sponsorTable.getTableName();
 
         TestTable teamTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
+                buildUniqueTable(DATA_SOURCE
                                           , "Team"
                                           ," id bigint not null" +
                                           ", name varchar(255) not null" +
                                           ", sponsor_id bigint not null" +
                                           ", primary key (id)"
                                           )
-                        .create()
-                        .alter(teamSponsorForeignKey)
-                        .insertValues("1, 'Manchester United', 1");
+                .create()
+                .alter(teamSponsorForeignKey)
+                .insertValues("1, 'Manchester United', 1");
 
         String playerTeamForeignKey =  "add constraint player_team_fk" + generateRandomPositiveInt()
-                + " foreign key (team_id)"
-                + " references " + teamTable.getTableName();
+                                    + " foreign key (team_id)"
+                                    + " references " + teamTable.getTableName();
         TestTable playerTable =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Player"
-                                          , "id bigint not null"
-                                          + ", firstName varchar(255)"
-                                          + ", lastName varchar(255)"
-                                          + ", team_id bigint not null"
-                                          + ", primary key (id)")
-                        .create()
-                        .alter(playerTeamForeignKey)
-                        .insertValues("1, 'Paul', 'Pogba', 1");
+                buildUniqueTable(DATA_SOURCE
+                                , "Player"
+                                , "id bigint not null"
+                                + ", firstName varchar(255)"
+                                + ", lastName varchar(255)"
+                                + ", team_id bigint not null"
+                                + ", primary key (id)")
+                .create()
+                .alter(playerTeamForeignKey)
+                .insertValues("1, 'Paul', 'Pogba', 1");
+
+        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
 
         // WHEN
-        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(playerSelect);
 
@@ -366,11 +305,13 @@ public class H2Test extends H2Configuration {
         teamTable.create().alter(teamSponsorForeignKey);
         playerTable.create().alter(playerTeamForeignKey);
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(teamTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(teamTable).row(0).column(0).hasValues(1);
-        TestTable.TestTableAssert.assertThat(teamTable).row(0).column(1).hasValues("Manchester United");
-        TestTable.TestTableAssert.assertThat(sponsorTable).withScript(insertScript).hasNumberOfRows(1);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).withScript(insertScript)
+                             .hasNumberOfRows(1)
+                             .row(0).hasValues(1, "Manchester United", 1);
+        assertThat(sponsorTable).withScript(insertScript)
+                                .hasNumberOfRows(1);
 
     }
 

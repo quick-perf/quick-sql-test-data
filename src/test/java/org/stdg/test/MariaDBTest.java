@@ -25,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class MariaDBTest {
 
     private static final String DB_USER_NAME = "user";
@@ -77,10 +76,9 @@ public class MariaDBTest {
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        assertThat(playerTable).row(0).column(0).hasValues(1);
-        assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba");
 
     }
 
@@ -109,7 +107,8 @@ public class MariaDBTest {
 
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
 
     }
 
@@ -136,10 +135,9 @@ public class MariaDBTest {
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        assertThat(playerTable).row(0).column(0).hasValues(1);
-        assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba");
 
     }
 
@@ -188,8 +186,10 @@ public class MariaDBTest {
         teamTable.drop().create();
         playerTable.create().alter(playerTableConstraint);
         SQL_EXECUTOR.execute(insertStatements);
-        assertThat(playerTable).withGeneratedInserts(insertStatements).hasNumberOfRows(1);
-        assertThat(teamTable).hasNumberOfRows(1);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).withGeneratedInserts(insertStatements)
+                             .hasNumberOfRows(1);
 
     }
 

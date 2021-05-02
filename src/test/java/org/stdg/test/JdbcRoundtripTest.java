@@ -13,37 +13,23 @@
 
 package org.stdg.test;
 
-import net.ttddyy.dsproxy.support.ProxyDataSource;
-import org.junit.jupiter.api.*;
-import org.quickperf.junit5.QuickPerfTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.quickperf.sql.annotation.ExpectJdbcQueryExecution;
-import org.quickperf.sql.config.QuickPerfSqlDataSourceBuilder;
 import org.stdg.SqlTestDataGenerator;
 
-import javax.sql.DataSource;
 import java.util.Random;
 
-@QuickPerfTest
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class JdbcRoundtripTest {
+import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 
-    private static DataSource DATA_SOURCE;
+public class JdbcRoundtripTest extends H2Configuration {
 
-    private static SqlExecutor SQL_EXECUTOR;
     private TestTable t1Table;
     private TestTable t2Table;
     private TestTable t3Table;
     private String t2TableConstraint;
     private String insertScript;
-
-    @BeforeAll
-    public static void beforeAll() {
-        DataSource h2Datasource = DataSourceBuilder.build("jdbc:h2:mem:test", "user", "pwd");
-        ProxyDataSource quickPerfProxyDataSource = QuickPerfSqlDataSourceBuilder.aDataSourceBuilder()
-                .buildProxy(h2Datasource);
-        DATA_SOURCE = quickPerfProxyDataSource;
-        SQL_EXECUTOR = new SqlExecutor(DATA_SOURCE);
-    }
 
     @BeforeEach
     public void prepare_test_data() {
@@ -114,9 +100,12 @@ public class JdbcRoundtripTest {
         t1Table.drop().create();
         t2Table.create().alter(t2TableConstraint);
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(t1Table).withScript(insertScript).hasNumberOfRows(2);
-        TestTable.TestTableAssert.assertThat(t2Table).withScript(insertScript).hasNumberOfRows(2);
-        TestTable.TestTableAssert.assertThat(t3Table).withScript(insertScript).hasNumberOfRows(2);
+        assertThat(t1Table).withScript(insertScript)
+                           .hasNumberOfRows(2);
+        assertThat(t2Table).withScript(insertScript)
+                           .hasNumberOfRows(2);
+        assertThat(t3Table).withScript(insertScript)
+                           .hasNumberOfRows(2);
     }
 
 }

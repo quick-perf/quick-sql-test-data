@@ -13,8 +13,6 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.RepeatedTest;
 import org.stdg.SqlTestDataGenerator;
 
@@ -22,10 +20,9 @@ import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.stdg.test.TestTable.TestTableAssert;
+import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class SortInsertStatementsTest extends H2Configuration {
 
     @RepeatedTest(9) public void
@@ -58,10 +55,10 @@ public class SortInsertStatementsTest extends H2Configuration {
                 .alter(playerTableConstraint)
                 .insertValues("1, 'Paul', 'Pogba', 1");
 
-        // WHEN
         String playerSelect = "SELECT * FROM " + playerTable.getTableName();
         String teamSelect = "SELECT * FROM " + teamTable.getTableName();
 
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(playerSelect, teamSelect);
 
@@ -70,8 +67,10 @@ public class SortInsertStatementsTest extends H2Configuration {
         teamTable.drop().create();
         playerTable.create().alter(playerTableConstraint);
         SQL_EXECUTOR.execute(insertScript);
-        TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTableAssert.assertThat(teamTable).hasNumberOfRows(1);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).withScript(insertScript)
+                             .hasNumberOfRows(1);
 
     }
 

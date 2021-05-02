@@ -13,33 +13,13 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.quickperf.junit5.QuickPerfTest;
 import org.quickperf.sql.annotation.ExpectJdbcQueryExecution;
 import org.stdg.SqlTestDataGenerator;
 
-import javax.sql.DataSource;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.quickperf.sql.config.QuickPerfSqlDataSourceBuilder.aDataSourceBuilder;
 
-@QuickPerfTest
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class InsertTest {
-
-    static DataSource DATA_SOURCE;
-
-    static SqlExecutor SQL_EXECUTOR;
-
-    @BeforeAll
-    public static void beforeAll() {
-        DataSource h2Datasource = DataSourceBuilder.build("jdbc:h2:mem:test", "user", "pwd");
-        DATA_SOURCE = aDataSourceBuilder().buildProxy(h2Datasource);
-        SQL_EXECUTOR = new SqlExecutor(DATA_SOURCE);
-    }
+public class InsertTest extends H2Configuration {
 
     @Test public void
     should_generate_an_empty_insert_script_for_an_insert_input() {

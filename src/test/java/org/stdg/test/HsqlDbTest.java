@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class HsqlDbTest {
 
     private static DataSource DATA_SOURCE;
@@ -57,10 +57,9 @@ public class HsqlDbTest {
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(0).hasValues(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba");
 
     }
 
@@ -79,9 +78,10 @@ public class HsqlDbTest {
                 .create()
                 .insertValues("1, 'Paul', 'Pogba'");
 
-        // WHEN
         String playerTableName = playerTable.getTableName();
         String select = "SELECT * FROM " + playerTableName;
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
 
@@ -90,7 +90,8 @@ public class HsqlDbTest {
 
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
 
     }
 
@@ -108,19 +109,19 @@ public class HsqlDbTest {
                 .create()
                 .insertValues("1, 'Paul', 'Pogba'");
 
-        // WHEN
         String playerTableName = playerTable.getTableName();
         String select = "SELECT id FROM " + playerTableName + " WHERE lastName = 'Pogba'";
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
 
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(0).hasValues(1);
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        TestTable.TestTableAssert.assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba");
 
     }
 
@@ -153,10 +154,10 @@ public class HsqlDbTest {
                 .alter(playerTableConstraint)
                 .insertValues("1, 'Paul', 'Pogba', 1");
 
-        // WHEN
         String playerSelect = "SELECT * FROM " + playerTable.getTableName();
         String teamSelect = "SELECT * FROM " + teamTable.getTableName();
 
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(playerSelect, teamSelect);
 
@@ -165,8 +166,10 @@ public class HsqlDbTest {
         teamTable.drop().create();
         playerTable.create().alter(playerTableConstraint);
         SQL_EXECUTOR.execute(insertStatements);
-        TestTable.TestTableAssert.assertThat(playerTable).withGeneratedInserts(insertStatements).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(teamTable).hasNumberOfRows(1);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).withGeneratedInserts(insertStatements)
+                             .hasNumberOfRows(1);
 
     }
 
@@ -204,8 +207,9 @@ public class HsqlDbTest {
                 .alter(playerTableConstraint)
                 .insertValues("1, 'Paul', 'Pogba', 1");
 
-        // WHEN
         String playerSelect = "SELECT * FROM " + playerTable.getTableName();
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(playerSelect);
 
@@ -214,8 +218,10 @@ public class HsqlDbTest {
         teamTable.drop().create();
         playerTable.create().alter(playerTableConstraint);
         SQL_EXECUTOR.execute(insertStatements);
-        TestTable.TestTableAssert.assertThat(playerTable).withGeneratedInserts(insertStatements).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(teamTable).hasNumberOfRows(1);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).withGeneratedInserts(insertStatements)
+                             .hasNumberOfRows(1);
 
     }
 
@@ -238,9 +244,10 @@ public class HsqlDbTest {
                         .insertValues("2, 2, 'colA_r1_value', 'colB_r1_value'")
                         .insertValues("2, 1, 'colA_r1_value', 'colB_r1_value'");
 
-        // WHEN
         String select1 = "SELECT * FROM " + table.getTableName() + " WHERE col_id1 = 1";
         String select2 = "SELECT * FROM " + table.getTableName() + " WHERE col_id1 = 2";
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select1, select2);
 

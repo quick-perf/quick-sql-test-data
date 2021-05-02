@@ -13,17 +13,15 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.stdg.DatabaseMetadataFinder;
 import org.stdg.SqlTestDataGenerator;
 import org.stdg.dbtype.DatabaseType;
 
-import static org.stdg.dbtype.DatabaseMetadataFinderFactory.*;
-import static org.stdg.test.TestTable.TestTableAssert.*;
+import static org.stdg.dbtype.DatabaseMetadataFinderFactory.createDatabaseMetadataFinderFrom;
+import static org.stdg.test.TestTable.*;
+import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class NotFullyManagedDatabaseTest extends H2Configuration {
 
     @Test public void
@@ -31,24 +29,22 @@ public class NotFullyManagedDatabaseTest extends H2Configuration {
 
         // GIVEN
         TestTable table =
-                TestTable.buildUniqueTable(DATA_SOURCE
-                                          , "Table"
-                                          , "col1 varchar(25)"
-                                          + ", col2 varchar(25)"
-                                          + ", col3 varchar(25)"
-                                          )
-                        .create()
-                        .insertValues("'val1', 'val2', 'val3'")
-                        .insertValues("'val3', 'val4', 'val5'");
-
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "col1 varchar(25)"
+                                + ", col2 varchar(25)"
+                                + ", col3 varchar(25)"
+                                )
+                .create()
+                .insertValues("'val1', 'val2', 'val3'")
+                .insertValues("'val3', 'val4', 'val5'");
 
         DatabaseMetadataFinder databaseMetadataFinderOfNotFullyManagedDatabase =
                 createDatabaseMetadataFinderFrom(DATA_SOURCE, DatabaseType.OTHER);
         SqlTestDataGenerator sqlTestDataGeneratorOfNotFullyManagedDatabase =
                 SqlTestDataGenerator.buildFrom(DATA_SOURCE, databaseMetadataFinderOfNotFullyManagedDatabase);
 
-        String playerTableName = table.getTableName();
-        String select = "SELECT col1, col2 FROM " + playerTableName;
+        String select = "SELECT col1, col2 FROM " + table.getTableName();
 
         // WHEN
         String insertScript = sqlTestDataGeneratorOfNotFullyManagedDatabase.generateInsertScriptFor(select);
@@ -56,7 +52,8 @@ public class NotFullyManagedDatabaseTest extends H2Configuration {
         // THEN
         table.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        assertThat(table).hasNumberOfRows(2);
+        assertThat(table).withScript(insertScript)
+                         .hasNumberOfRows(2);
 
     }
 

@@ -13,14 +13,13 @@
 
 package org.stdg.test;
 
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.stdg.SqlTestDataGenerator;
 
 import java.util.Random;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+import static org.stdg.test.TestTable.TestTableAssert.assertThat;
+
 public class DatasetRowsMergingTest extends H2Configuration {
 
     @Test public void
@@ -37,20 +36,20 @@ public class DatasetRowsMergingTest extends H2Configuration {
                         .create()
                         .insertValues("'val1', 'val2', 'val3'");
 
+        String tableName = table.getTableName();
+        String select1 = "SELECT col1, col2 FROM " + tableName;
+        String select2 = "SELECT col1, col3 FROM " + tableName;
+
         // WHEN
-        String playerTableName = table.getTableName();
-        String select1 = "SELECT col1, col2 FROM " + playerTableName;
-        String select2 = "SELECT col1, col3 FROM " + playerTableName;
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select1, select2);
 
         // THEN
         table.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        TestTable.TestTableAssert.assertThat(table).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(table).row(0).column(0).hasValues("val1");
-        TestTable.TestTableAssert.assertThat(table).row(0).column(1).hasValues("val2");
-        TestTable.TestTableAssert.assertThat(table).row(0).column(2).hasValues("val3");
+        assertThat(table).withScript(insertScript)
+                         .hasNumberOfRows(1)
+                         .row(0).hasValues("val1", "val2", "val3");
 
     }
 
@@ -101,9 +100,10 @@ public class DatasetRowsMergingTest extends H2Configuration {
                 .alter(playerTeamForeignKey)
                 .insertValues("1, 'Paul', 'Pogba', 1");
 
-        // WHEN
         String playerSelect = "SELECT * FROM " + playerTable.getTableName();
         String sponsorSelect = "SELECT * FROM " + sponsorTable.getTableName();
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(playerSelect, sponsorSelect);
 
@@ -115,10 +115,9 @@ public class DatasetRowsMergingTest extends H2Configuration {
         playerTable.create().alter(playerTeamForeignKey);
         SQL_EXECUTOR.execute(insertScript);
 
-        TestTable.TestTableAssert.assertThat(sponsorTable).withScript(insertScript).hasNumberOfRows(1);
-        TestTable.TestTableAssert.assertThat(sponsorTable).row(0).column(0).hasValues(1);
-        TestTable.TestTableAssert.assertThat(sponsorTable).row(0).column(1).hasValues("Sponsor name");
-        TestTable.TestTableAssert.assertThat(sponsorTable).row(0).column(2).hasValues("France");
+        assertThat(sponsorTable).withScript(insertScript)
+                                .hasNumberOfRows(1)
+                                .row(0).hasValues(1, "Sponsor name", "France");
 
     }
 

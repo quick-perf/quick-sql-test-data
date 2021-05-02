@@ -14,8 +14,6 @@
 package org.stdg.test;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.stdg.SqlTestDataGenerator;
 import org.testcontainers.containers.MariaDBContainer;
@@ -27,7 +25,6 @@ import java.util.Random;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class MariaDBSlowTest {
 
     private static final String DB_USER_NAME = "user";
@@ -91,8 +88,10 @@ public class MariaDBSlowTest {
         teamTable.drop().create();
         playerTable.create().alter(playerTableConstraint);
         SQL_EXECUTOR.execute(insertStatements);
-        assertThat(playerTable).withGeneratedInserts(insertStatements).hasNumberOfRows(1);
-        assertThat(teamTable).hasNumberOfRows(1);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).withGeneratedInserts(insertStatements)
+                             .hasNumberOfRows(1);
 
     }
 

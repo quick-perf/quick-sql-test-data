@@ -225,6 +225,9 @@
                     <includes>
                         <include>src/**</include>
                     </includes>
+                    <excludes>
+                        <exclude>src/test/resources/junit-platform.properties</exclude>
+                    </excludes>
                     <properties>
                         <project>${project.name}</project>
                         <year>${project.inceptionYear}</year>

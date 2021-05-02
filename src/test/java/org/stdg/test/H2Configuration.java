@@ -13,10 +13,15 @@
 
 package org.stdg.test;
 
+import net.ttddyy.dsproxy.support.ProxyDataSource;
 import org.junit.jupiter.api.BeforeAll;
+import org.quickperf.junit5.QuickPerfTest;
 
 import javax.sql.DataSource;
 
+import static org.quickperf.sql.config.QuickPerfSqlDataSourceBuilder.aDataSourceBuilder;
+
+@QuickPerfTest
 class H2Configuration {
 
    static DataSource DATA_SOURCE;
@@ -25,7 +30,8 @@ class H2Configuration {
 
     @BeforeAll
     public static void beforeAll() {
-        DATA_SOURCE = DataSourceBuilder.build("jdbc:h2:mem:test", "user", "pwd");
+        DataSource h2Datasource = DataSourceBuilder.build("jdbc:h2:mem:test", "user", "pwd");
+        DATA_SOURCE = aDataSourceBuilder().buildProxy(h2Datasource);
         SQL_EXECUTOR = new SqlExecutor(DATA_SOURCE);
     }
 

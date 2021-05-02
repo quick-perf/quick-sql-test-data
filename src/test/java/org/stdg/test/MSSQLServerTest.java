@@ -25,7 +25,6 @@ import java.util.Random;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class MSSQLServerTest {
 
     private static final MSSQLServerContainer MS_SQL_SERVER
@@ -64,17 +63,18 @@ public class MSSQLServerTest {
                 .insertValues("1, 'Paul', 'Pogba'")
                 .insertValues("2, 'Antoine', 'Griezmann'");
 
-        // WHEN
         String playerTableName = playerTable.getTableName();
         String select = "SELECT * FROM " + playerTableName;
 
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
 
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript).hasNumberOfRows(2);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(2);
 
     }
 
@@ -103,7 +103,8 @@ public class MSSQLServerTest {
 
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
 
     }
 
@@ -120,19 +121,19 @@ public class MSSQLServerTest {
                .create()
                .insertValues("1, 'Paul', 'Pogba'");
 
-        // WHEN
         String playerTableName = playerTable.getTableName();
         String select = "SELECT id FROM " + playerTableName + " WHERE lastName = 'Pogba'";
+
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
 
         // THEN
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        assertThat(playerTable).row(0).column(0).hasValues(1);
-        assertThat(playerTable).row(0).column(1).hasValues("Paul");
-        assertThat(playerTable).row(0).column(2).hasValues("Pogba");
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(1, "Paul", "Pogba");
 
     }
 
@@ -164,10 +165,10 @@ public class MSSQLServerTest {
                         .alter(playerTableConstraint)
                         .insertValues("1, 'Paul', 'Pogba', 1");
 
-        // WHEN
         String playerSelect = "SELECT * FROM " + playerTable.getTableName();
         String teamSelect = "SELECT * FROM " + teamTable.getTableName();
 
+        // WHEN
         SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
         String insertScript = sqlTestDataGenerator
                              .generateInsertScriptFor(playerSelect, teamSelect);
@@ -177,8 +178,10 @@ public class MSSQLServerTest {
         teamTable.drop().create();
         playerTable.create().alter(playerTableConstraint);
         SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
-        assertThat(teamTable).hasNumberOfRows(1);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
+        assertThat(teamTable).withScript(insertScript)
+                             .hasNumberOfRows(1);
 
     }
 
