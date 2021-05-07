@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
                  , DatasetRowApiTest.class
                  , SelectTest.class
                  , UpdateTest.class
+                 , DeleteTest.class
                  , InsertTest.class
                  , SortInsertStatementsTest.class
                  , DatasetRowsMergingTest.class
