@@ -13,7 +13,6 @@
 
 package org.stdg.test;
 
-import net.ttddyy.dsproxy.support.ProxyDataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.quickperf.junit5.QuickPerfTest;
 

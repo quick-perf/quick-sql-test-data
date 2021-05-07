@@ -24,6 +24,7 @@ import java.sql.*;
 import java.util.*;
 
 import static java.util.Collections.emptyList;
+import static org.stdg.SelectTransformerFactory.*;
 
 class DatasetRowsFinder {
 
@@ -34,11 +35,15 @@ class DatasetRowsFinder {
     }
 
     Collection<DatasetRow> findDatasetRowsOf(SqlQuery sqlQuery) {
-        Optional<SqlQuery> optionalSelectQuery = sqlQuery.transformToSelectQuery();
+
+        SelectTransformer selectTransformer = createSelectTransformer(sqlQuery);
+        Optional<SqlQuery> optionalSelectQuery = selectTransformer.toSelect(sqlQuery);
+
         if (optionalSelectQuery.isPresent()) {
             SqlQuery selectQuery = optionalSelectQuery.get();
             return execute(selectQuery);
         }
+
         return emptyList();
     }
 
