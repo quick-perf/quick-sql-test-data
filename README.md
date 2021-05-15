@@ -40,7 +40,7 @@ With Maven, you have to add the following dependency:
 
 You can generate the insert statements with the help of an instance of `org.stdg.SqlTestDataGenerator` class.
 
-_SQL test date generator_ works with:
+_SQL test data generator_ works with:
 * H2
 * HSQLDB
 * MariaDB
