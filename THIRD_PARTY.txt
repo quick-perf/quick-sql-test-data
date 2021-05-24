@@ -1,0 +1,18 @@
+SQL test data generator uses:
+* JSqlParser licensed under Apache Software License, Version 2.0 (https://github.com/JSQLParser/JSqlParser/blob/master/LICENSE_APACHEV2) or  LGPL V2.1 (https://github.com/JSQLParser/JSqlParser/blob/master/LICENSE_LGPLV21)
+
+SQL test data generator uses only for testing and doesn't ship with:
+* JUnit 5 licensed under Eclipse Public License - v 2.0 (https://github.com/junit-team/junit5/blob/main/LICENSE.md)
+* AssertJ licensed under Apache Software License, Version 2.0 (https://github.com/assertj/assertj-core/blob/main/LICENSE.txt)
+* AssertJ-DB licensed under Apache Software License, Version 2.0 (https://github.com/assertj/assertj-db/blob/main/LICENSE.txt)
+* QuickPerf licensed under Apache Software License, Version 2.0 (https://github.com/quick-perf/quickperf/blob/master/LICENSE.txt)
+* Testcontainers licensed under MIT License (https://github.com/testcontainers/testcontainers-java/blob/master/LICENSE)
+* HikariCP licensed under Apache Software License, Version 2.0 (https://github.com/brettwooldridge/HikariCP/blob/dev/LICENSE)
+* Logback licensed under Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1 (https://github.com/qos-ch/logback/blob/master/LICENSE.txt)
+* H2 licensed under Mozilla Public License Version 2.0 or Eclipse Public License v1.0 (https://github.com/h2database/h2database/blob/master/LICENSE.txt)
+* MariaDB Docker licenced under GNU General Public License v2.0 (https://github.com/MariaDB/mariadb-docker/blob/master/LICENSE)
+* MariaDB java connector licenced under GNU Lesser General Public License version 2.1 (https://github.com/mariadb-corporation/mariadb-connector-j/blob/master/LICENSE)
+* Microsoft SQL Server Docker image licensed under End-User Licensing Agreement (https://hub.docker.com/_/microsoft-mssql-server#environment-variables)
+* Microsoft JDBC Driver for SQL Server licensed under MIT License (https://github.com/microsoft/mssql-jdbc/blob/dev/LICENSE)
+* PostgreSQL Docker image licensed under MIT License (https://github.com/docker-library/postgres/blob/master/LICENSE)
+* PostgreSQL JDBC Driver licensed under BSD 2-Clause "Simplified" License (https://github.com/pgjdbc/pgjdbc/blob/master/LICENSE)
