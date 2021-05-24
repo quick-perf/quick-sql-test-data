@@ -115,8 +115,8 @@
         </dependency>
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc11</artifactId>
-            <version>21.1.0.0</version>
+            <artifactId>ojdbc8</artifactId>
+            <version>19.7.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
