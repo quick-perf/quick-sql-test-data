@@ -54,6 +54,10 @@ public class DatabaseMetadataFinderFactory {
             return new MSSQLServerMetadataFinder(dataSource);
         }
 
+        if(dbType.equals(ORACLE)) {
+            return new OracleMetadataFinder();
+        }
+
         return new DefaultDatabaseMetadataFinder(dataSource);
 
     }
