@@ -65,7 +65,7 @@ class TestTable {
     }
 
     TestTable drop() {
-        sqlExecutor.execute("drop table if exists " + tableName);
+        sqlExecutor.execute("drop table " + tableName);
         return this;
     }
 

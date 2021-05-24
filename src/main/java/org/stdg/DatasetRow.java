@@ -53,10 +53,12 @@ public class DatasetRow {
     }
 
     void sortColumnsFollowing(List<String> databaseColumnOrders) {
-        ColumnNamesComparator columnNamesComparator = ColumnNamesComparator.from(databaseColumnOrders);
-        TreeMap<String, Object> columnValueByColumnName = new TreeMap<>(columnNamesComparator);
-        columnValueByColumnName.putAll(this.columnValueByColumnName);
-        this.columnValueByColumnName = columnValueByColumnName;
+        if (!databaseColumnOrders.isEmpty()) {
+            ColumnNamesComparator columnNamesComparator = ColumnNamesComparator.from(databaseColumnOrders);
+            TreeMap<String, Object> columnValueByColumnName = new TreeMap<>(columnNamesComparator);
+            columnValueByColumnName.putAll(this.columnValueByColumnName);
+            this.columnValueByColumnName = columnValueByColumnName;
+        }
     }
 
     boolean mergeWithARowOf(Collection<DatasetRow> datasetRows) {

@@ -16,3 +16,5 @@ SQL test data generator uses only for testing and doesn't ship with:
 * Microsoft JDBC Driver for SQL Server licensed under MIT License (https://github.com/microsoft/mssql-jdbc/blob/dev/LICENSE)
 * PostgreSQL Docker image licensed under MIT License (https://github.com/docker-library/postgres/blob/master/LICENSE)
 * PostgreSQL JDBC Driver licensed under BSD 2-Clause "Simplified" License (https://github.com/pgjdbc/pgjdbc/blob/master/LICENSE)
+* Oracle Database Express Edition licensed under Oracle Free Use Terms and Conditions (https://docs.oracle.com/en/database/oracle/oracle-database/18/xelic/licensing-information.html#GUID-5D29C372-9B49-4A4D-A9AF-70ACA12CCF46, https://www.oracle.com/downloads/licenses/oracle-free-license.html)
+* Oracle JDBC driver licensed under Oracle Free Use Terms and Conditions (https://www.oracle.com/downloads/licenses/oracle-free-license.html)

@@ -30,6 +30,8 @@ public enum DatabaseType {
     MICROSOFT_SQL_SERVER("jdbc:sqlserver")
     ,/**MySQL*/
     MY_SQL("jdbc:mysql")
+    ,/**Oracle*/
+    ORACLE("jdbc:oracle")
     ,/**PostgreSQL*/
     POSTGRE_SQL("jdbc:postgresql")
     ,/**Other database type*/
