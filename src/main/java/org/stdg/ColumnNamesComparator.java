@@ -45,12 +45,7 @@ class ColumnNamesComparator implements Comparator<String> {
     }
 
     private int findPositionOf(String colName1) {
-        Integer position = positionByColumnName.get(colName1);
-        boolean otherDbTypeOrDbTableHasChangedWithLessOrMoreColumns = position == null;
-        if(otherDbTypeOrDbTableHasChangedWithLessOrMoreColumns) {
-            return 0;
-        }
-        return position;
+        return positionByColumnName.get(colName1);
     }
 
 }
