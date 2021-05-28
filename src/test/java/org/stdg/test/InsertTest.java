@@ -19,7 +19,7 @@ import org.stdg.SqlTestDataGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InsertTest extends H2Configuration {
+public class InsertTest extends H2Config {
 
     @Test public void
     should_generate_an_empty_insert_script_for_an_insert_input() {

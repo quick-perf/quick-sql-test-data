@@ -22,7 +22,7 @@ import java.util.List;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-public class DatasetRowApiTest extends H2Configuration {
+public class DatasetRowApiTest extends H2Config {
 
     @Test public void
     should_generate_working_insert_from_a_dataset_row() {

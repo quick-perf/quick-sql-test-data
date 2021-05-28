@@ -44,12 +44,16 @@ class DatasetRowComparatorBuilder {
             }
 
             String tableName = datasetRow1.getTableName();
-            List<String> primaryColumns = primaryKeyColumnsFinder.findPrimaryColumnsOf(tableName);
+            List<String> primaryKeyColumns = primaryKeyColumnsFinder.findPrimaryColumnsOf(tableName);
 
-            String primaryKey1 = computePrimaryKeyAsString(datasetRow1, primaryColumns);
-            String primaryKey2 = computePrimaryKeyAsString(datasetRow2, primaryColumns);
+            for (String primaryKeyColumn : primaryKeyColumns) {
+                int intComparison = compareIntPkValues(primaryKeyColumn, datasetRow1, datasetRow2);
+                if(intComparison != 0) {
+                    return intComparison;
+                }
+            }
 
-            return primaryKey1.compareTo(primaryKey2);
+            return 0;
 
         }
 
@@ -57,14 +61,19 @@ class DatasetRowComparatorBuilder {
             return datasetRow1.getTableName().equals(datasetRow2.getTableName());
         }
 
-        private String computePrimaryKeyAsString(DatasetRow datasetRow1, List<String> primaryColumns) {
-            StringBuilder resultAsStringBuilder = new StringBuilder();
-            for (String primaryColumn : primaryColumns) {
-                Object primaryKeyValue = datasetRow1.getValueOf(primaryColumn);
-                String primaryKeyValueAsString = primaryKeyValue.toString();
-                resultAsStringBuilder.append(primaryKeyValueAsString);
+        private int compareIntPkValues(String primaryKeyColumn, DatasetRow datasetRow1, DatasetRow datasetRow2) {
+            Object pkValue1 = datasetRow1.getValueOf(primaryKeyColumn);
+            Object pkValue2 = datasetRow2.getValueOf(primaryKeyColumn);
+            boolean integerPrimaryKey = pkValue1 instanceof Integer
+                                     || pkValue1 instanceof Long;
+            if(integerPrimaryKey) {
+                Number pkValue1AsNumber = (Number) pkValue1;
+                Number pkValue2AsNumber = (Number) pkValue2;
+                long pkValue1AsLong = pkValue1AsNumber.longValue();
+                long pkValue2AsLong = pkValue2AsNumber.longValue();
+                return Long.compare(pkValue1AsLong, pkValue2AsLong );
             }
-            return resultAsStringBuilder.toString();
+            return 0;
         }
 
     }

@@ -20,7 +20,7 @@ import java.util.Random;
 
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 
-public class DatasetRowsMergingTest extends H2Configuration {
+public class DatasetRowsMergingTest extends H2Config {
 
     @Test public void
     should_merge_dataset_rows_if_columns_in_common_have_same_values() {

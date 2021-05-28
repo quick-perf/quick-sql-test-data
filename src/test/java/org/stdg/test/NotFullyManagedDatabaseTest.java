@@ -22,7 +22,7 @@ import static org.stdg.dbtype.DatabaseMetadataFinderFactory.createDatabaseMetada
 import static org.stdg.test.TestTable.*;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 
-public class NotFullyManagedDatabaseTest extends H2Configuration {
+public class NotFullyManagedDatabaseTest extends H2Config {
 
     @Test public void
     should_generate_insert_statements_without_necessarily_taking_account_of_database_constraints_if_the_database_is_not_supposed_to_be_fully_managed() {

@@ -16,11 +16,10 @@ package org.stdg.test;
 import org.junit.jupiter.api.Test;
 import org.stdg.SqlTestDataGenerator;
 
-import static org.stdg.test.TestTable.TestTableAssert;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-public class UpdateTest extends H2Configuration {
+public class UpdateTest extends H2Config {
 
     @Test public void
     should_generate_one_insert_if_all_rows_are_updated_and_no_mandatory_columns() {
