@@ -19,9 +19,14 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <description>This Java library aims to ease the generation of datasets to test SQL queries. It produces INSERT statements taking account of integrity constraints.</description>
+
+    <url>https://github.com/quick-perf/sql-test-data-generator</url>
+
     <groupId>org.quickperf</groupId>
     <artifactId>sql-test-data-generator</artifactId>
     <version>0.1-SNASPHOT</version>
+    <name>SQL test data generator</name>
     <inceptionYear>2021</inceptionYear>
 
     <properties>
@@ -286,4 +291,120 @@
             </plugin>
         </plugins>
     </build>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/quick-perf/sql-test-data-generator</url>
+    </issueManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>gpg</executable>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <failOnError>true</failOnError>
+                            <show>public</show>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>3.0.0-M1</version>
+                        <configuration>
+                            <allowTimestampedSnapshots>true</allowTimestampedSnapshots> <!--Because of junit4-spring-base-tests-->
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <useReleaseProfile>false</useReleaseProfile>
+                            <releaseProfiles>release</releaseProfiles>
+                            <goals>deploy</goals>
+                            <tagNameFormat>release-@{project.version}</tagNameFormat>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+    <scm>
+        <connection>scm:git:https://github.com/quick-perf/sql-test-data-generator.git</connection>
+        <developerConnection>scm:git:git@github.com:quick-perf/sql-test-data-generator.git</developerConnection>
+        <url>https://github.com/quick-perf/sql-test-data-generator</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>jeanbisutti</id>
+            <name>Jean Bisutti</name>
+            <email>jean.bisutti@gmail.com</email>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
 </project>
