@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.stdg.test.TestTable.*;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 
-public class H2Test extends H2Configuration {
+public class H2Test extends H2Config {
 
     @Test public void
     should_generate_an_insert_statement_with_columns_declared_in_the_same_order_as_in_the_table() {

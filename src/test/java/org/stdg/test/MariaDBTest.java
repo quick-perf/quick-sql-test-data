@@ -14,6 +14,8 @@
 package org.stdg.test;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.stdg.SqlTestDataGenerator;
 import org.testcontainers.containers.MariaDBContainer;
 
@@ -232,6 +234,45 @@ public class MariaDBTest {
 
         String fourthInsert = insertStatements.get(3);
         assertThat(fourthInsert).as(insertStatementsAsString).contains("VALUES(2, 2");
+
+    }
+
+    // Not possible to both repeat and parameterize a JUnit 5 test
+    @ParameterizedTest
+    @ValueSource(strings = {"INT", "TINYINT", "SMALLINT", "MEDIUMINT", "BIGINT"})
+    public void
+    should_sort_insert_statements_following_an_integer_primary_key(String intType) {
+
+        TestTable table =
+                buildUniqueTable(DATA_SOURCE
+                                , "table_with_int_pk"
+                                , "col_id " + intType + "," +
+                                "colA  varchar(20), " +
+                                "colB  varchar(20), " +
+                                "constraint int_pk" + generateRandomPositiveInt() + " primary key (col_id)"
+                                )
+                        .create()
+                        .insertValues("2, 'A', 'B'")
+                        .insertValues("10, 'C', 'D'")
+                        .insertValues("1, 'E', 'F'");
+
+        String selectAll = "SELECT * FROM " + table.getTableName();
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+
+        // WHEN
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(selectAll);
+
+        // THEN
+        String insertStatementsAsString = insertStatements.toString();
+
+        String firstQuery = insertStatements.get(0);
+        assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1");
+
+        String secondQuery = insertStatements.get(1);
+        assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2");
+
+        String thirdQuery = insertStatements.get(2);
+        assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(10");
 
     }
 

@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
                  , DeleteTest.class
                  , InsertTest.class
                  , SortInsertStatementsTest.class
+                 , SortInsertStatementsWithPkTest.class
                  , DatasetRowsMergingTest.class
                  , JdbcRoundtripTest.class} )
 public class FastTestSuite {

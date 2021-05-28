@@ -19,7 +19,7 @@ import org.stdg.SqlTestDataGenerator;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-public class DeleteTest extends H2Configuration {
+public class DeleteTest extends H2Config {
 
     @Test
     public void

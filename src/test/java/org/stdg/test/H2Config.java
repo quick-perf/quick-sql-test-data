@@ -21,7 +21,7 @@ import javax.sql.DataSource;
 import static org.quickperf.sql.config.QuickPerfSqlDataSourceBuilder.aDataSourceBuilder;
 
 @QuickPerfTest
-class H2Configuration {
+class H2Config {
 
    static DataSource DATA_SOURCE;
 

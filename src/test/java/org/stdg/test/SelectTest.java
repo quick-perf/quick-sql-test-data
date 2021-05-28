@@ -22,7 +22,7 @@ import java.util.List;
 import static org.stdg.test.TestTable.*;
 import static org.stdg.test.TestTable.TestTableAssert.*;
 
-public class SelectTest extends H2Configuration {
+public class SelectTest extends H2Config {
 
     @Test public void
     should_generate_working_insert_from_a_select_statement() {

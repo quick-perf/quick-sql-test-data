@@ -23,7 +23,7 @@ import java.util.Random;
 
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 
-public class JdbcRoundtripTest extends H2Configuration {
+public class JdbcRoundtripTest extends H2Config {
 
     private TestTable t1Table;
     private TestTable t2Table;

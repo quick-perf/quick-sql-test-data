@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.stdg.test.TestTable.TestTableAssert.assertThat;
 import static org.stdg.test.TestTable.buildUniqueTable;
 
-public class SortInsertStatementsTest extends H2Configuration {
+public class SortInsertStatementsTest extends H2Config {
 
     @RepeatedTest(9) public void
     should_sort_insert_statements_following_table_dependencies() {
@@ -77,47 +77,6 @@ public class SortInsertStatementsTest extends H2Configuration {
     private int generateRandomPositiveInt() {
         Random random = new Random();
         return Math.abs(random.nextInt());
-    }
-
-    @RepeatedTest(9) public void
-    should_sort_insert_statements_following_the_primary_key_values() {
-
-        // GIVEN
-        TestTable table =
-                buildUniqueTable(DATA_SOURCE
-                                , "comp_pk"
-                                , "col_id1   integer," +
-                                "col_id2   integer, " +
-                                "colA  varchar(20), " +
-                                "colB  varchar(20), " +
-                                "constraint comp_pk_pk" + generateRandomPositiveInt() + " primary key (col_id2, col_id1)"
-                                )
-                .create()
-                .insertValues("1, 2, 'colA_r1_value', 'colB_r1_value'")
-                .insertValues("1, 1, 'colA_r1_value', 'colB_r1_value'")
-                .insertValues("2, 2, 'colA_r1_value', 'colB_r1_value'")
-                .insertValues("2, 1, 'colA_r1_value', 'colB_r1_value'");
-
-        // WHEN
-        String selectAll = "SELECT * FROM " + table.getTableName();
-        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
-        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(selectAll);
-
-        // THEN
-        String insertStatementsAsString = insertStatements.toString();
-
-        String firstQuery = insertStatements.get(0);
-        assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1, 1");
-
-        String secondQuery = insertStatements.get(1);
-        assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2, 1");
-
-        String thirdQuery = insertStatements.get(2);
-        assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(1, 2");
-
-        String fourthQuery = insertStatements.get(3);
-        assertThat(fourthQuery).as(insertStatementsAsString).contains("VALUES(2, 2");
-
     }
 
     @RepeatedTest(9) public void
