@@ -1,6 +1,6 @@
 # SQL test data generator
 
-  <a href="https://search.maven.org/search?q=org.quickperf">
+  <a href="https://search.maven.org/artifact/org.quickperf/sql-test-data-generator">
     <img src="https://maven-badges.herokuapp.com/maven-central/org.quickperf/sql-test-data-generator/badge.svg"
          alt="Maven Central">
   </a>
