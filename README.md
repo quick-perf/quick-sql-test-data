@@ -1,5 +1,10 @@
 # SQL test data generator
 
+  <a href="https://search.maven.org/artifact/org.quickperf/sql-test-data-generator">
+    <img src="https://maven-badges.herokuapp.com/maven-central/org.quickperf/sql-test-data-generator/badge.svg"
+         alt="Maven Central">
+  </a>
+  &nbsp;&nbsp;
   <a href="https://github.com/quick-perf/sql-test-data-generator/blob/master/LICENSE.txt">
     <img src="https://img.shields.io/badge/license-Apache2-blue.svg"
          alt = "License">
