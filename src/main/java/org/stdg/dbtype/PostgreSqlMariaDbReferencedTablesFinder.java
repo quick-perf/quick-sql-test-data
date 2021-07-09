@@ -55,8 +55,7 @@ class PostgreSqlMariaDbReferencedTablesFinder implements ReferencedTablesFinder 
     private final BaseReferencedTablesFinder referencedTablesFinder;
 
     PostgreSqlMariaDbReferencedTablesFinder(DataSource dataSource) {
-        this.referencedTablesFinder = new BaseReferencedTablesFinder(dataSource
-                , REFERENCED_TABLES_QUERY);
+        this.referencedTablesFinder = new BaseReferencedTablesFinder(dataSource, REFERENCED_TABLES_QUERY);
     }
 
     @Override

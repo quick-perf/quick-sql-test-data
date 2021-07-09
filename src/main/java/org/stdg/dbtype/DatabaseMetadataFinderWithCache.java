@@ -20,6 +20,7 @@ import org.stdg.ReferencedTableSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * A DatabaseMetadataFinder caching method calls
@@ -69,6 +70,11 @@ public class DatabaseMetadataFinderWithCache implements DatabaseMetadataFinder {
     @Override
     public List<String> findPrimaryColumnsOf(String tableName) {
         return primaryColumnsByTableName.computeIfAbsent(tableName, t -> delegate.findPrimaryColumnsOf(tableName));
+    }
+
+    @Override
+    public Function<String, String> getFunctionToHaveMetadataTableName() {
+        return delegate.getFunctionToHaveMetadataTableName();
     }
 
 }

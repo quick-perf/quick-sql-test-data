@@ -16,6 +16,8 @@ package org.stdg;
 import org.stdg.dbtype.DatabaseMetadataFinderFactory;
 import org.stdg.dbtype.DatabaseMetadataFinderWithCache;
 
+import java.util.function.Function;
+
 /**
  * Interface describing the methods needed by the library to retrieve some database metadata.
  *
@@ -27,4 +29,9 @@ public interface DatabaseMetadataFinder extends NotNullColumnsFinder
                                               , ReferencedTablesFinder
                                               , ColumnsMappingsFinder
                                               , PrimaryKeyColumnsFinder {
+
+    default Function<String, String> getFunctionToHaveMetadataTableName() {
+        return tableName -> tableName;
+    }
+
 }

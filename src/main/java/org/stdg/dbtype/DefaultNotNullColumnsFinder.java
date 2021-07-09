@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,32 +37,15 @@ class DefaultNotNullColumnsFinder implements NotNullColumnsFinder {
                     "where is_nullable = 'NO'\n" +
                     "  AND table_name=?");
 
-    private final DataSource dataSource;
+    private BaseNotNullColumnsFinder delegate;
 
     DefaultNotNullColumnsFinder(DataSource dataSource) {
-        this.dataSource = dataSource;
+        delegate = new BaseNotNullColumnsFinder(dataSource, NOT_NULL_COLUMNS_QUERY);
     }
 
     @Override
-    public List<String> findNotNullColumnsOf(String tableName) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement columnOrderStatement = PreparedStatementBuilder.buildFrom(NOT_NULL_COLUMNS_QUERY, connection)) {
-            columnOrderStatement.setString(1, tableName);
-            ResultSet queryResult = columnOrderStatement.executeQuery();
-            return findNotNullColumnsFrom(queryResult);
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-        return Collections.emptyList();
-    }
-
-    private List<String> findNotNullColumnsFrom(ResultSet resultSet) throws SQLException {
-        List<String> notNullColumns = new ArrayList<>();
-        while (resultSet.next()) {
-            String columnName = resultSet.getString(3);
-            notNullColumns.add(columnName);
-        }
-        return notNullColumns;
+    public Collection<String> findNotNullColumnsOf(String tableName) {
+        return delegate.findNotNullColumnsOf(tableName);
     }
 
 }

@@ -18,6 +18,7 @@ import org.stdg.DatabaseMetadataFinder;
 import org.stdg.ReferencedTableSet;
 
 import javax.sql.DataSource;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +42,7 @@ class DefaultDatabaseMetadataFinder implements DatabaseMetadataFinder {
     }
 
     @Override
-    public List<String> findNotNullColumnsOf(String tableName) {
+    public Collection<String> findNotNullColumnsOf(String tableName) {
         return defaultNotNullColumnsFinder.findNotNullColumnsOf(tableName);
     }
 

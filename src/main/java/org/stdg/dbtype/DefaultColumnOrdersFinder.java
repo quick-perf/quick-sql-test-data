@@ -14,16 +14,9 @@
 package org.stdg.dbtype;
 
 import org.stdg.ColumnOrdersFinder;
-import org.stdg.PreparedStatementBuilder;
 import org.stdg.SqlQuery;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 class DefaultColumnOrdersFinder implements ColumnOrdersFinder {
@@ -37,32 +30,15 @@ class DefaultColumnOrdersFinder implements ColumnOrdersFinder {
                     " where table_name=?" +
                     " order by position");
 
-    private final DataSource dataSource;
+    private BaseColumnOrdersFinder delegate;
 
     DefaultColumnOrdersFinder(DataSource dataSource) {
-        this.dataSource = dataSource;
+        delegate = new BaseColumnOrdersFinder(dataSource, COLUMN_ORDER_QUERY);
     }
 
     @Override
     public List<String> findDatabaseColumnOrdersOf(String tableName) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement columnOrderStatement = PreparedStatementBuilder.buildFrom(COLUMN_ORDER_QUERY, connection)) {
-            columnOrderStatement.setString(1, tableName);
-            ResultSet queryResult = columnOrderStatement.executeQuery();
-            return findColumnOrderFrom(queryResult);
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-        return Collections.emptyList();
-    }
-
-    private List<String> findColumnOrderFrom(ResultSet queryResult) throws SQLException {
-        List<String> columnOrder = new ArrayList<>();
-        while (queryResult.next()) {
-            String columnName = queryResult.getString(3);
-            columnOrder.add(columnName);
-        }
-        return columnOrder;
+        return delegate.findDatabaseColumnOrdersOf(tableName);
     }
 
 }
