@@ -14,13 +14,14 @@
 package org.stdg;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
 public class DatasetRow {
 
-    private final String tableName;
+    private String tableName;
 
     private TreeMap<String, Object> columnValueByColumnName = new TreeMap<>();
 
@@ -150,6 +151,11 @@ public class DatasetRow {
 
     Object getValueOf(String columnName) {
         return columnValueByColumnName.get(columnName);
+    }
+
+    void updateTableNameWith(Function<String, String> tableNameFunction) {
+        String newTableName = tableNameFunction.apply(tableName);
+        tableName = newTableName;
     }
 
 }

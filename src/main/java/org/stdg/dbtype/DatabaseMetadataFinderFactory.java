@@ -55,7 +55,7 @@ public class DatabaseMetadataFinderFactory {
         }
 
         if(dbType.equals(ORACLE)) {
-            return new OracleMetadataFinder();
+            return new OracleMetadataFinder(dataSource);
         }
 
         return new DefaultDatabaseMetadataFinder(dataSource);

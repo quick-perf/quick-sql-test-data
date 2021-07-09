@@ -15,6 +15,7 @@ package org.stdg;
 
 import javax.sql.DataSource;
 import java.util.*;
+import java.util.function.Function;
 
 class DatasetRowSet {
 
@@ -36,6 +37,9 @@ class DatasetRowSet {
     }
 
     private void add(DatasetRow datasetRow) {
+
+        Function<String, String> functionToHaveMetadataTableName = databaseMetadataFinder.getFunctionToHaveMetadataTableName();
+        datasetRow.updateTableNameWith(functionToHaveMetadataTableName);
 
         boolean rowIsMerged = datasetRow.mergeWithARowOf(datasetRows);
 
