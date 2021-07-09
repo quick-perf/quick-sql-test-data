@@ -30,6 +30,8 @@ The library automatically:
 * sorts insert statements to accommodate  *foreign key constraints*
 * sorts insert statements following *primary key values*
 
+[Another project](https://github.com/quick-perf/web-sql-test-data-generator#web-sql-test-data-generator) provides a web page to ease the use of the _SQL test data generator library_.
+
 ## How to use the library
 
 With Maven, you have to add the following dependency:
@@ -46,12 +48,13 @@ With Maven, you have to add the following dependency:
 You can generate the insert statements with the help of an instance of `org.stdg.SqlTestDataGenerator` class.
 
 _SQL test data generator_ works with:
+* PostgreSQL
+* Oracle
+* MariaDB
+* MySQL
+* Microsoft SQL Server
 * H2
 * HSQLDB
-* MariaDB
-* Microsoft SQL Server
-* MySQL
-* PostgreSQL
 
 ## Use cases
 
