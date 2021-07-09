@@ -13,6 +13,7 @@
 
 package org.stdg;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
@@ -65,7 +66,8 @@ class DatasetRowComparatorBuilder {
             Object pkValue1 = datasetRow1.getValueOf(primaryKeyColumn);
             Object pkValue2 = datasetRow2.getValueOf(primaryKeyColumn);
             boolean integerPrimaryKey = pkValue1 instanceof Integer
-                                     || pkValue1 instanceof Long;
+                                     || pkValue1 instanceof Long
+                                     || pkValue1 instanceof BigDecimal;
             if(integerPrimaryKey) {
                 Number pkValue1AsNumber = (Number) pkValue1;
                 Number pkValue2AsNumber = (Number) pkValue2;
