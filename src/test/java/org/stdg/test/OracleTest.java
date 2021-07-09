@@ -245,6 +245,86 @@ public class OracleTest {
                              .hasNumberOfRows(1);
     }
 
+    @RepeatedTest(9) public void
+    should_sort_insert_statements_following_primary_keys() {
+
+        // GIVEN
+        TestTable table =
+               buildUniqueTable(DATA_SOURCE
+                               , "comp_pk"
+                               , "col_id1   integer," +
+                                "col_id2   integer, " +
+                                "colA  varchar(20), " +
+                                "colB  varchar(20), " +
+                                "constraint comp_pk_pk" + generateRandomPositiveInt() + " primary key (col_id2, col_id1)"
+                               )
+               .create()
+               .insertValues("1, 2, 'colA_r1_value', 'colB_r1_value'")
+               .insertValues("1, 1, 'colA_r1_value', 'colB_r1_value'")
+               .insertValues("2, 2, 'colA_r1_value', 'colB_r1_value'")
+               .insertValues("2, 1, 'colA_r1_value', 'colB_r1_value'");
+
+        // WHEN
+        String selectAll = "SELECT * FROM " + table.getTableName();
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(selectAll);
+
+        // THEN
+        String insertQueriesAsString = insertStatements.toString();
+
+        String firstInsert = insertStatements.get(0);
+        Assertions.assertThat(firstInsert).as(insertQueriesAsString).contains("VALUES(1, 1");
+
+        String secondInsert = insertStatements.get(1);
+        Assertions.assertThat(secondInsert).as(insertQueriesAsString).contains("VALUES(2, 1");
+
+        String thirdInsert = insertStatements.get(2);
+        Assertions.assertThat(thirdInsert).as(insertQueriesAsString).contains("VALUES(1, 2");
+
+        String fourthInsert = insertStatements.get(3);
+        Assertions.assertThat(fourthInsert).as(insertQueriesAsString).contains("VALUES(2, 2");
+
+    }
+
+    // Not possible to both repeat and parameterize a JUnit 5 test
+    @ParameterizedTest
+    @ValueSource(strings = {"INTEGER", "SMALLINT"})
+    public void
+    should_sort_insert_statements_following_an_integer_primary_key(String intType) {
+
+        TestTable table =
+                buildUniqueTable(DATA_SOURCE
+                                , "table_with_int_pk"
+                                , "col_id " + intType + "," +
+                                "colA  varchar(20), " +
+                                "colB  varchar(20), " +
+                                "constraint int_pk" + generateRandomPositiveInt() + " primary key (col_id)"
+                                )
+                .create()
+                .insertValues("2, 'A', 'B'")
+                .insertValues("10, 'C', 'D'")
+                .insertValues("1, 'E', 'F'");
+
+        String selectAll = "SELECT * FROM " + table.getTableName();
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+
+        // WHEN
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(selectAll);
+
+        // THEN
+        String insertStatementsAsString = insertStatements.toString();
+
+        String firstQuery = insertStatements.get(0);
+        Assertions.assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1");
+
+        String secondQuery = insertStatements.get(1);
+        Assertions.assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2");
+
+        String thirdQuery = insertStatements.get(2);
+        Assertions.assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(10");
+
+    }
+
     private int generateRandomPositiveInt() {
         Random random = new Random();
         return Math.abs(random.nextInt());
