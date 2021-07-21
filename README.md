@@ -41,7 +41,7 @@ With Maven, you have to add the following dependency:
 <dependency>
     <groupId>org.quickperf</groupId>
     <artifactId>sql-test-data-generator</artifactId>
-    <version>0.1-SNASPHOT</version>
+    <version>0.1-SNAPSHOT</version>
 </dependency>
 ```
 
