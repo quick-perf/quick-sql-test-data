@@ -25,7 +25,7 @@
 
     <groupId>org.quickperf</groupId>
     <artifactId>sql-test-data-generator</artifactId>
-    <version>0.1-SNASPHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <name>SQL test data generator</name>
     <inceptionYear>2021</inceptionYear>
 
