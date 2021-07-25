@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
                  , UpdateTest.class
                  , DeleteTest.class
                  , InsertTest.class
+                 , H2DateTypesTest.class
                  , SortInsertStatementsTest.class
                  , SortInsertStatementsWithPkTest.class
                  , DatasetRowsMergingTest.class

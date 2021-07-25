@@ -13,6 +13,8 @@
 
 package org.stdg;
 
+import org.stdg.dbtype.DatabaseType;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,15 +26,19 @@ class RowFinder {
 
     private final DataSource dataSource;
 
-    RowFinder(DataSource dataSource) {
+    private final DatabaseType dbType;
+
+    RowFinder(DataSource dataSource, DatabaseType dbType) {
         this.dataSource = dataSource;
+        this.dbType = dbType;
     }
 
     DatasetRow findOneRowFrom(String tableName
                             , Collection<String> columnNamesToSearch
                             , DatasetRow rowToSearch) {
 
-        SqlQuery missingColumnValuesQuery = SqlQuery.buildFromRow(columnNamesToSearch, rowToSearch);
+        SqlQuery missingColumnValuesQuery =
+                SqlQuery.buildFromRow(columnNamesToSearch, rowToSearch, dbType);
 
         DatasetRow missingColumnValues = DatasetRow.ofTable(tableName);
         try (Connection connection = dataSource.getConnection();

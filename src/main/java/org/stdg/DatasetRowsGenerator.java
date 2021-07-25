@@ -13,6 +13,8 @@
 
 package org.stdg;
 
+import org.stdg.dbtype.DatabaseType;
+
 import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.List;
@@ -21,19 +23,23 @@ class DatasetRowsGenerator {
 
     private final DataSource dataSource;
 
+    private final DatabaseType dbType;
+
     private final DatabaseMetadataFinder databaseMetadataFinder;
 
     private final DatasetRowsFinder datasetRowsFinder;
 
     DatasetRowsGenerator(DataSource dataSource
+                       , DatabaseType dbType
                        , DatabaseMetadataFinder databaseMetadataFinder) {
         this.dataSource = dataSource;
+        this.dbType = dbType;
         this.databaseMetadataFinder = databaseMetadataFinder;
         this.datasetRowsFinder = new DatasetRowsFinder(dataSource);
     }
 
     List<DatasetRow> generateDatasetRowsFor(List<SqlQuery> sqlQueries) {
-        DatasetRowSet datasetRowSet = new DatasetRowSet(dataSource, databaseMetadataFinder);
+        DatasetRowSet datasetRowSet = new DatasetRowSet(dataSource, dbType, databaseMetadataFinder);
         for (SqlQuery sqlQuery : sqlQueries) {
             Collection<DatasetRow> datasetRows = datasetRowsFinder.findDatasetRowsOf(sqlQuery);
             datasetRowSet.add(datasetRows);

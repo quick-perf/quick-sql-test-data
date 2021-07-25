@@ -13,6 +13,8 @@
 
 package org.stdg;
 
+import org.stdg.dbtype.DatabaseType;
+
 import java.util.*;
 
 import static java.util.stream.Collectors.joining;
@@ -33,13 +35,15 @@ public class SqlQuery {
         this.parameters = parameters;
     }
 
-    static SqlQuery buildFromRow(DatasetRow rowToSearch) {
+    static SqlQuery buildFromRow(DatasetRow rowToSearch, DatabaseType dbType) {
         Set<String> columnNames = rowToSearch.getColumnNames();
-        return buildFromRow(columnNames, rowToSearch);
+        return buildFromRow(columnNames, rowToSearch, dbType);
 
     }
 
-    static SqlQuery buildFromRow(Collection<String> columnNamesToSearch, DatasetRow rowToSearch) {
+    static SqlQuery buildFromRow(Collection<String> columnNamesToSearch
+                                , DatasetRow rowToSearch
+                                , DatabaseType dbType) {
             Map<String, Object> valuesToMatch = rowToSearch.getColumnValueByColumnName();
             String whereConditions =
                      valuesToMatch.entrySet()
@@ -49,7 +53,8 @@ public class SqlQuery {
                         return columnName
                                 + (entry.getValue() == null
                                    ? " IS NULL"
-                                   : "=" + ColumnValueFormatter.INSTANCE.formatColumnValue(entry.getValue()));
+                                   : "=" + ColumnValueFormatter.INSTANCE
+                                           .formatColumnValue(entry.getValue(), dbType));
                     })
                     .collect(joining(" AND "));
             String queryAsString =

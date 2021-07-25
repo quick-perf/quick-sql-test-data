@@ -13,6 +13,8 @@
 
 package org.stdg;
 
+import org.stdg.dbtype.DatabaseType;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -23,9 +25,11 @@ import static java.util.stream.Collectors.toList;
 
 class InsertStatementsGenerator {
 
-    public static final InsertStatementsGenerator INSTANCE = new InsertStatementsGenerator();
+    private final DatabaseType dbType;
 
-    private InsertStatementsGenerator() { }
+    InsertStatementsGenerator(DatabaseType dbType) {
+        this.dbType = dbType;
+    }
 
     String generateInsertScriptFor(List<DatasetRow> datasetRows) {
         return   datasetRows
@@ -50,7 +54,8 @@ class InsertStatementsGenerator {
     private String formatColumnValues(Collection<Object> columnValues) {
         return  columnValues
                .stream()
-               .map(ColumnValueFormatter.INSTANCE::formatColumnValue)
+               .map(columnValue -> ColumnValueFormatter.INSTANCE
+                                  .formatColumnValue(columnValue, dbType))
                .collect(joining(", "));
     }
 

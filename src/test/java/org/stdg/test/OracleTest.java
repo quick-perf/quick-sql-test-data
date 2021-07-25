@@ -34,7 +34,7 @@ public class OracleTest {
     private static DataSource DATA_SOURCE;
 
     private static final OracleContainer ORACLE_CONTAINER
-            = new OracleContainer("gvenzl/oracle-xe")
+            = new OracleContainer("gvenzl/oracle-xe:18-slim")
              .withEnv("ORACLE_PASSWORD", "oracle");
 
     private static SqlExecutor SQL_EXECUTOR;
@@ -322,6 +322,289 @@ public class OracleTest {
 
         String thirdQuery = insertStatements.get(2);
         Assertions.assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(10");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "dateCol Date"
+                                )
+                .create()
+                .insertValues("TO_DATE('2012-09-17', 'yyyy-mm-dd')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues("2012-09-17");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type_with_day_number_less_than_10() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "dateCol Date"
+                                )
+                .create()
+                .insertValues("TO_DATE('2012-09-05', 'yyyy-mm-dd')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                .hasNumberOfRows(1)
+                .row(0).hasValues("2012-09-05");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type_with_hour_less_than_10() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "dateCol Date"
+                                )
+                .create()
+                .insertValues("TO_DATE('2012-09-05 08', 'yyyy-mm-dd HH24')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+
+        String insertStatement = insertStatements.get(0);
+        Assertions.assertThat(insertStatement).contains("8");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type_with_hour_greater_than_10() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "dateCol Date"
+                                )
+                .create()
+                .insertValues("TO_DATE('2012-09-05 13', 'yyyy-mm-dd HH24')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+
+        String insertStatement = insertStatements.get(0);
+        Assertions.assertThat(insertStatement).contains("13");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type_and_a_month_after_september() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "dateCol Date"
+                                )
+                .create()
+                .insertValues("TO_DATE('2012-10-17', 'yyyy-mm-dd')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues("2012-10-17");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type_and_minutes_less_than_10() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "dateCol Date"
+                                )
+                .create()
+                .insertValues("TO_DATE('2012-09-17 16:09', 'yyyy-mm-dd HH24:MI')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+
+        String insertStatement = insertStatements.get(0);
+        Assertions.assertThat(insertStatement)
+                  .as("Generated INSERT: " + insertStatement)
+                  .contains("9");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type_and_minutes_greater_than_10() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "dateCol Date"
+                                )
+                .create()
+                .insertValues("TO_DATE('2012-09-17 16:28', 'yyyy-mm-dd HH24:MI')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+
+        String insertStatement = insertStatements.get(0);
+        Assertions.assertThat(insertStatement)
+                  .as("Generated INSERT: " + insertStatement)
+                  .contains("28");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type_and_seconds_greater_than_nine() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "dateCol Date"
+                                )
+                .create()
+                .insertValues("TO_DATE('2012-10-17 17:22:33', 'yyyy-mm-dd HH24:MI:SS')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_timestamp_type_and_ms_less_than_100() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "timestampCol TIMESTAMP"
+                                )
+                .create()
+                .insertValues("TO_TIMESTAMP('2012-09-17 19:56:47.21', 'YYYY-MM-DD HH24:MI:SS.FF')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+        String insertStatement = insertStatements.get(0);
+        Assertions.assertThat(insertStatement).contains("'2012-09-17 19:56:47.210'");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_timestamp_type_and_milliseconds_greater_than_100() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "timestampCol TIMESTAMP"
+                                )
+                .create()
+                .insertValues("TO_TIMESTAMP('2012-09-17 19:56:47.104', 'YYYY-MM-DD HH24:MI:SS.FF')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                               .hasNumberOfRows(1);
+        String insertStatement = insertStatements.get(0);
+        Assertions.assertThat(insertStatement).contains("'2012-09-17 19:56:47.104'");
 
     }
 
