@@ -13,6 +13,8 @@
 
 package org.stdg;
 
+import org.stdg.dbtype.DatabaseType;
+
 import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,10 +26,13 @@ class MissingNotNullColumnsFinder {
 
     private final DataSource dataSource;
 
+    private final DatabaseType dbType;
+
     private final DatabaseMetadataFinder databaseMetadataFinder;
 
-    MissingNotNullColumnsFinder(DataSource dataSource, DatabaseMetadataFinder databaseMetadataFinder) {
+    MissingNotNullColumnsFinder(DataSource dataSource, DatabaseType dbType, DatabaseMetadataFinder databaseMetadataFinder) {
         this.dataSource = dataSource;
+        this.dbType = dbType;
         this.databaseMetadataFinder = databaseMetadataFinder;
     }
 
@@ -43,7 +48,7 @@ class MissingNotNullColumnsFinder {
                                                    .collect(toList());
 
         if (!missingNotNullColumns.isEmpty()) {
-            RowFinder rowFinder = new RowFinder(dataSource);
+            RowFinder rowFinder = new RowFinder(dataSource, dbType);
             DatasetRow datasetRowWithMissingNotNullColumns = rowFinder.findOneRowFrom(datasetRow.getTableName(), missingNotNullColumns, datasetRow);
             return datasetRowWithMissingNotNullColumns.getColumnValueByColumnName();
         }

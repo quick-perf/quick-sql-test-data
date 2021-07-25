@@ -40,8 +40,14 @@ public class SqlTestDataGenerator {
 
     private final DatasetRowsGenerator datasetRowsGenerator;
 
-    private SqlTestDataGenerator(DatasetRowsGenerator datasetRowsGenerator) {
+    private final DatabaseType dbType;
+
+    private InsertStatementsGenerator insertStatementGenerator;
+
+    private SqlTestDataGenerator(DatasetRowsGenerator datasetRowsGenerator, DatabaseType dbType) {
         this.datasetRowsGenerator = datasetRowsGenerator;
+        this.dbType = dbType;
+        insertStatementGenerator = new InsertStatementsGenerator(dbType);
     }
 
     /**
@@ -55,12 +61,12 @@ public class SqlTestDataGenerator {
         DatabaseType dbType = DatabaseType.findFromDbUrl(dbUrl);
         DatabaseMetadataFinder databaseMetadataFinder = DatabaseMetadataFinderFactory.createDatabaseMetadataFinderFrom(dataSource, dbType);
         DatabaseMetadataFinder databaseMetadataFinderWithCache = DatabaseMetadataFinderWithCache.buildFrom(databaseMetadataFinder);
-        return buildFrom(dataSource, databaseMetadataFinderWithCache);
+        return buildFrom(dataSource, dbType, databaseMetadataFinderWithCache);
     }
 
-    public static SqlTestDataGenerator buildFrom(DataSource dataSource, DatabaseMetadataFinder databaseMetadataFinder) {
-        DatasetRowsGenerator datasetRowsGenerator = new DatasetRowsGenerator(dataSource, databaseMetadataFinder);
-        return new SqlTestDataGenerator(datasetRowsGenerator);
+    public static SqlTestDataGenerator buildFrom(DataSource dataSource, DatabaseType dbType, DatabaseMetadataFinder databaseMetadataFinder) {
+        DatasetRowsGenerator datasetRowsGenerator = new DatasetRowsGenerator(dataSource, dbType, databaseMetadataFinder);
+        return new SqlTestDataGenerator(datasetRowsGenerator, dbType);
     }
 
     public String generateInsertScriptFor(String sqlQuery) {
@@ -74,7 +80,7 @@ public class SqlTestDataGenerator {
 
     public String generateInsertScriptFor(List<SqlQuery> sqlQueries) {
         List<DatasetRow> datasetRows = datasetRowsGenerator.generateDatasetRowsFor(sqlQueries);
-        return InsertStatementsGenerator.INSTANCE.generateInsertScriptFor(datasetRows);
+        return insertStatementGenerator.generateInsertScriptFor(datasetRows);
     }
 
     public String generateInsertScriptFor(String... sqlQueries) {
@@ -85,7 +91,7 @@ public class SqlTestDataGenerator {
     }
 
     public List<String> generateInsertListFor(DatasetRow datasetRow) {
-        SqlQuery sqlQuery = SqlQuery.buildFromRow(datasetRow);
+        SqlQuery sqlQuery = SqlQuery.buildFromRow(datasetRow, dbType);
         return generateInsertListFor(sqlQuery.toString());
     }
 
@@ -94,7 +100,7 @@ public class SqlTestDataGenerator {
                                         .map(SqlQuery::new)
                                         .collect(toList());
         List<DatasetRow> datasetRows = datasetRowsGenerator.generateDatasetRowsFor(sqlQueryObjects);
-        return InsertStatementsGenerator.INSTANCE.generateInsertStatementsFor(datasetRows);
+        return insertStatementGenerator.generateInsertStatementsFor(datasetRows);
     }
 
 }

@@ -24,7 +24,7 @@ import java.sql.*;
 import java.util.*;
 
 import static java.util.Collections.emptyList;
-import static org.stdg.SelectTransformerFactory.*;
+import static org.stdg.SelectTransformerFactory.createSelectTransformer;
 
 class DatasetRowsFinder {
 
@@ -61,7 +61,8 @@ class DatasetRowsFinder {
 
             while (resultSet.next()) {
                 Collection<DatasetRow> datasetRows =
-                        buildDatasetRowsFrom(resultSet, resultSetMetaData, columnCount, sqlQuery);
+                        buildDatasetRowsFrom(resultSet, resultSetMetaData
+                                           , columnCount, sqlQuery);
                 datasetRowsToReturn.addAll(datasetRows);
             }
         } catch (SQLException sqlException) {

@@ -12,6 +12,7 @@ SQL test data generator uses only for testing and doesn't ship with:
 * H2 licensed under Mozilla Public License Version 2.0 or Eclipse Public License v1.0 (https://github.com/h2database/h2database/blob/master/LICENSE.txt)
 * MariaDB Docker licenced under GNU General Public License v2.0 (https://github.com/MariaDB/mariadb-docker/blob/master/LICENSE)
 * MariaDB java connector licenced under GNU Lesser General Public License version 2.1 (https://github.com/mariadb-corporation/mariadb-connector-j/blob/master/LICENSE)
+  Please read this: https://mariadb.com/kb/en/licensing-faq/#licenses-used-by-mariadb
 * Microsoft SQL Server Docker image licensed under End-User Licensing Agreement (https://hub.docker.com/_/microsoft-mssql-server#environment-variables)
 * Microsoft JDBC Driver for SQL Server licensed under MIT License (https://github.com/microsoft/mssql-jdbc/blob/dev/LICENSE)
 * PostgreSQL Docker image licensed under MIT License (https://github.com/docker-library/postgres/blob/master/LICENSE)

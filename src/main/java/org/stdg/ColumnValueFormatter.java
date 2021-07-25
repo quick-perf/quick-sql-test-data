@@ -13,20 +13,76 @@
 
 package org.stdg;
 
+import org.stdg.dbtype.DatabaseType;
+
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.OffsetTime;
+import java.util.Calendar;
+
 class ColumnValueFormatter {
 
     static final ColumnValueFormatter INSTANCE = new ColumnValueFormatter();
 
     private ColumnValueFormatter() { }
 
-    String formatColumnValue(Object columnValue) {
-        if (columnValue instanceof String || columnValue instanceof java.sql.Date) {
+    String formatColumnValue(Object columnValue, DatabaseType dbType) {
+        if(columnValue == null) {
+            return "NULL";
+        } else if(DatabaseType.ORACLE.equals(dbType)
+               && columnValue instanceof Timestamp) {
+            Timestamp timeStamp = (Timestamp) columnValue;
+            return buildOracleToDateFunctionFor(timeStamp);
+        } else if(DatabaseType.ORACLE.equals(dbType)
+               && isOracleSqlTimestamp(columnValue)) {
+            return buildOracleToTimeStampFunctionFor(columnValue);
+        } else if (columnValue instanceof String
+                || columnValue instanceof java.sql.Date
+                || columnValue instanceof Timestamp
+                || columnValue instanceof Time
+                || columnValue instanceof OffsetTime
+                || isTimestampWithTimeZoneH2Type(columnValue)) {
             String stringColumnValue = columnValue.toString();
             return "'" + stringColumnValue + "'";
-        } else if (columnValue == null) {
-            return "NULL";
         }
         return columnValue.toString();
+    }
+
+    private String buildOracleToDateFunctionFor(Timestamp timeStamp) {
+        //https://stackoverflow.com/questions/9180014/using-oracle-to-date-function-for-date-string-with-milliseconds
+        // "An Oracle DATE does not store times with more precision than a second."
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(timeStamp);
+        int monthNumber = calendar.get(Calendar.MONTH) + 1;
+        int secondNumber = calendar.get(Calendar.SECOND);
+        String toDateString = calendar.get(Calendar.YEAR)
+                            + "-" + (monthNumber < 10 ? "0" : "") + monthNumber
+                            + "-" + calendar.get(Calendar.DAY_OF_MONTH)
+                            + "-" + calendar.get(Calendar.HOUR_OF_DAY)
+                            + "-" + calendar.get(Calendar.MINUTE)
+                            + "-" + (secondNumber < 10 ? "0" : "") + secondNumber;
+        return "TO_DATE('" + toDateString + "', 'yyyy-mm-dd-HH24-mi-ss')";
+    }
+
+    private boolean isOracleSqlTimestamp(Object columnValue) {
+        Class<?> columnValueClass = columnValue.getClass();
+        String classCanonicalName = columnValueClass.getCanonicalName();
+        return classCanonicalName.equals("oracle.sql.TIMESTAMP");
+    }
+
+    private String buildOracleToTimeStampFunctionFor(Object columnValue) {
+        String oracleTimeStampAsString = columnValue.toString();
+        String aDateWithMsLessThan100 = "2012-09-17 19:56:47.10";
+        boolean dateHasMsLessThan100 = oracleTimeStampAsString.length() == aDateWithMsLessThan100.length();
+        String dateForTimeStampCreation = dateHasMsLessThan100 ? oracleTimeStampAsString + "0" : oracleTimeStampAsString;
+        return "TO_TIMESTAMP('" + dateForTimeStampCreation
+                           + "', 'YYYY-MM-DD HH24:MI:SS.FF')";
+    }
+
+    private boolean isTimestampWithTimeZoneH2Type(Object columnValue) {
+        Class<?> columnValueClass = columnValue.getClass();
+        String classCanonicalName = columnValueClass.getCanonicalName();
+        return classCanonicalName.equals("org.h2.api.TimestampWithTimeZone");
     }
 
 }

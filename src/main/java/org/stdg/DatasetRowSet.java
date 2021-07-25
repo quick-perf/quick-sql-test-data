@@ -13,6 +13,8 @@
 
 package org.stdg;
 
+import org.stdg.dbtype.DatabaseType;
+
 import javax.sql.DataSource;
 import java.util.*;
 import java.util.function.Function;
@@ -25,9 +27,13 @@ class DatasetRowSet {
 
     private final Collection<DatasetRow> datasetRows = new ArrayDeque<>();
 
-    DatasetRowSet(DataSource dataSource, DatabaseMetadataFinder databaseMetadataFinder) {
+    DatasetRowSet( DataSource dataSource
+                 , DatabaseType dbType
+                 , DatabaseMetadataFinder databaseMetadataFinder) {
         this.databaseMetadataFinder = databaseMetadataFinder;
-        this.missingNotNullColumnsFinder = new MissingNotNullColumnsFinder(dataSource, databaseMetadataFinder);
+        this.missingNotNullColumnsFinder = new MissingNotNullColumnsFinder(dataSource
+                                                                          , dbType
+                                                                          , databaseMetadataFinder);
     }
 
     void add(Collection<DatasetRow> datasetRows) {

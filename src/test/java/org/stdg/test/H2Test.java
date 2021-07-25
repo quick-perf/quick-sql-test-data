@@ -30,11 +30,11 @@ public class H2Test extends H2Config {
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
-                                          , "player"
-                                          , "id bigint"
-                                          + ", firstName varchar(255)"
-                                          + ", lastName varchar(255)"
-                                          )
+                                , "player"
+                                , "id bigint"
+                                + ", firstName varchar(255)"
+                                + ", lastName varchar(255)"
+                                )
                 .create()
                 .insertValues("1, 'Paul', 'Pogba'");
 
@@ -122,12 +122,12 @@ public class H2Test extends H2Config {
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
-                                          , "Player"
-                                          , "  id bigint not null"
-                                          + ", firstName varchar(255) not null"
-                                          + ", lastName varchar(255) not null"
-                                          + ", team_id bigint"
-                                          )
+                                , "Player"
+                                , "  id bigint not null"
+                                + ", firstName varchar(255) not null"
+                                + ", lastName varchar(255) not null"
+                                + ", team_id bigint"
+                                )
                 .create()
                 .insertValues("1, 'Paul', 'Pogba', NULL");
 
@@ -267,12 +267,12 @@ public class H2Test extends H2Config {
 
         TestTable teamTable =
                 buildUniqueTable(DATA_SOURCE
-                                          , "Team"
-                                          ," id bigint not null" +
-                                          ", name varchar(255) not null" +
-                                          ", sponsor_id bigint not null" +
-                                          ", primary key (id)"
-                                          )
+                                 , "Team"
+                                 ," id bigint not null" +
+                                 ", name varchar(255) not null" +
+                                 ", sponsor_id bigint not null" +
+                                 ", primary key (id)"
+                                 )
                 .create()
                 .alter(teamSponsorForeignKey)
                 .insertValues("1, 'Manchester United', 1");

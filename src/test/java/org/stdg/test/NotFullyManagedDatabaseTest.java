@@ -42,7 +42,8 @@ public class NotFullyManagedDatabaseTest extends H2Config {
         DatabaseMetadataFinder databaseMetadataFinderOfNotFullyManagedDatabase =
                 createDatabaseMetadataFinderFrom(DATA_SOURCE, DatabaseType.OTHER);
         SqlTestDataGenerator sqlTestDataGeneratorOfNotFullyManagedDatabase =
-                SqlTestDataGenerator.buildFrom(DATA_SOURCE, databaseMetadataFinderOfNotFullyManagedDatabase);
+                SqlTestDataGenerator.buildFrom(DATA_SOURCE, DatabaseType.OTHER
+                                             , databaseMetadataFinderOfNotFullyManagedDatabase);
 
         String select = "SELECT col1, col2 FROM " + table.getTableName();
 
