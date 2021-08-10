@@ -30,7 +30,7 @@ import static org.stdg.test.TestTable.buildUniqueTable;
 public class MSSQLServerTest {
 
     private static final MSSQLServerContainer MS_SQL_SERVER
-            = new MSSQLServerContainer("mcr.microsoft.com/mssql/server:2019-CU9-ubuntu-16.04")
+            = new MSSQLServerContainer("mcr.microsoft.com/mssql/server:2019-CU12-ubuntu-20.04")
               .acceptLicense();
 
     private static DataSource DATA_SOURCE;
@@ -359,7 +359,7 @@ public class MSSQLServerTest {
 
 
     @Test public void
-    should_generate_an_insert_statement_with_a_date_type_fail() {
+    should_generate_an_insert_statement_with_a_date_type() {
 
         // GIVEN
         TestTable playerTable =

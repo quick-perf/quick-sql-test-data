@@ -36,6 +36,8 @@ class ColumnValueFormatter {
         } else if(DatabaseType.ORACLE.equals(dbType)
                && isOracleSqlTimestamp(columnValue)) {
             return buildOracleToTimeStampFunctionFor(columnValue);
+        }else if(DatabaseType.MICROSOFT_SQL_SERVER.equals((dbType))){
+
         } else if (columnValue instanceof String
                 || columnValue instanceof java.sql.Date
                 || columnValue instanceof Timestamp
