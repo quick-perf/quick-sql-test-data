@@ -386,13 +386,42 @@ public class MSSQLServerTest {
     }
 
     @Test public void
-    should_generate_an_insert_statement_with_a_timestamp_type_fail() {
+    should_generate_an_insert_statement_with_a_timestamp_type_and_ms_less_than_100() {
 
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
                         , "Table"
                         , "timestampCol TIMESTAMP"
+                )
+                        .create()
+                        .insertValues("TO_TIMESTAMP('2012-09-17 19:56:47.21', 'YYYY-MM-DD HH24:MI:SS.FF')");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertStatements);
+        assertThat(playerTable).withGeneratedInserts(insertStatements)
+                .hasNumberOfRows(1);
+        String insertStatement = insertStatements.get(0);
+        Assertions.assertThat(insertStatement).contains("'2012-09-17 19:56:47.210'");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_timestamp_type_fail() {
+        // https://stackoverflow.com/a/4470940/311420
+        // timestamp deprecated https://stackoverflow.com/a/55445674/311420
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                        , "Table"
+                        , "timestampCol ROWVERSION"
                 )
                         .create()
                         .insertValues("'2012-09-17 19:56:47.32'");

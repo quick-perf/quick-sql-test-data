@@ -36,8 +36,10 @@ class ColumnValueFormatter {
         } else if(DatabaseType.ORACLE.equals(dbType)
                && isOracleSqlTimestamp(columnValue)) {
             return buildOracleToTimeStampFunctionFor(columnValue);
-        }else if(DatabaseType.MICROSOFT_SQL_SERVER.equals((dbType))){
-
+        }else if(DatabaseType.MICROSOFT_SQL_SERVER.equals((dbType))
+                && columnValue instanceof  Timestamp){
+            Timestamp timeStamp = (Timestamp) columnValue;
+            return buildMsSQLServerToDateFunctionFor(timeStamp);
         } else if (columnValue instanceof String
                 || columnValue instanceof java.sql.Date
                 || columnValue instanceof Timestamp
@@ -48,6 +50,22 @@ class ColumnValueFormatter {
             return "'" + stringColumnValue + "'";
         }
         return columnValue.toString();
+    }
+
+    private String buildMsSQLServerToDateFunctionFor(Timestamp timeStamp) {
+        timeStamp.toString();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(timeStamp);
+        int monthNumber = calendar.get(Calendar.MONTH) + 1;
+        int secondNumber = calendar.get(Calendar.SECOND);
+        String toDateString = calendar.get(Calendar.YEAR)
+                + "-" + (monthNumber < 10 ? "0" : "") + monthNumber
+                + "-" + calendar.get(Calendar.DAY_OF_MONTH)
+                + "-" + calendar.get(Calendar.HOUR_OF_DAY)
+                + "-" + calendar.get(Calendar.MINUTE)
+                + "-" + (secondNumber < 10 ? "0" : "") + secondNumber;
+
+        return "TRY_CONVERT(DATETIME, '2012-06-05', 102)";
     }
 
     private String buildOracleToDateFunctionFor(Timestamp timeStamp) {
