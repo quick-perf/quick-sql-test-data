@@ -371,31 +371,37 @@ public class MariaDBTest {
         assertThat(insertScript).contains("'2012-09-17 19:56:47.0'");
     }
 
-//    @Test public void
-//    should_generate_an_insert_statement_with_a_timestamp_with_time_zone_type() {
-//
-//        // GIVEN
-//        TestTable playerTable =
-//                buildUniqueTable(DATA_SOURCE
-//                        , "Table"
-//                        , "col TIMESTAMP WITH TIME ZONE"
-//                )
-//                        .create()
-//                        .insertValues("'2012-09-17 19:56:47.32 UTC'");
-//
-//        // WHEN
-//        String playerTableName = playerTable.getTableName();
-//        String select = "SELECT * FROM " + playerTableName;
-//        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
-//        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
-//
-//        // THEN
-//        playerTable.recreate();
-//        SQL_EXECUTOR.execute(insertScript);
-//        assertThat(playerTable).withScript(insertScript)
-//                .hasNumberOfRows(1);
-//
-//    }
+    @Test public void
+    should_generate_an_insert_statement_with_a_timestamp_with_time_zone_type() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                        , "Table"
+                        , "col TIMESTAMP"
+                )
+                        .create()
+                        .insertValues("now()+0");
+//        https://www.educba.com/mariadb-timezone/
+//                        .insertValues("'2012-09-17 19:56:47'");
+//                        .insertValues("'2012-09-17 19:56:47.32'+2");
+
+//        https://mariadb.com/kb/en/datetime/#:~:text=MariaDB%20validates%20DATETIME%20literals%20against,invalid%20for%20that%20time%20zone.
+//        "SET time_zone = 'UTC' "
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        assertThat(playerTable).withScript(insertScript)
+                .hasNumberOfRows(1);
+
+    }
 
     @Test public void
     should_generate_an_insert_statement_with_a_time_type() {
