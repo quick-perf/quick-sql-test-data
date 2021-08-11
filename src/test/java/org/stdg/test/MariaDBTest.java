@@ -346,16 +346,16 @@ public class MariaDBTest {
     }
 
     @Test public void
-    should_generate_an_insert_statement_with_a_timestamp_type_fail() {
+    should_generate_an_insert_statement_with_a_timestamp_type() {
 
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "timestampCol TIMESTAMP"
+                    , "Table"
+                    , "timestampCol TIMESTAMP"
                 )
-                        .create()
-                        .insertValues("'2012-09-17 19:56:47.32'");
+                .create()
+                .insertValues("'2012-09-17 19:56:47.32'");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -368,9 +368,7 @@ public class MariaDBTest {
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
                 .hasNumberOfRows(1);
-        // TODO
-        // Assertions.assertThat(insertScript).contains("'2012-09-17 19:56:47.32'");
-
+        assertThat(insertScript).contains("'2012-09-17 19:56:47.0'");
     }
 
 //    @Test public void
