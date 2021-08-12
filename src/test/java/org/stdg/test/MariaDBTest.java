@@ -380,14 +380,18 @@ public class MariaDBTest {
                         , "Table"
                         , "col TIMESTAMP"
                 )
-                        .create()
-                        .insertValues("now()+0");
+                .create()
+                // date 2012-09-17 19:56:47 + 2h  ( https://mariadb.com/kb/en/now/ )
+                .insertValues("20120917195647.000000 + 2");
+
+
 //        https://www.educba.com/mariadb-timezone/
 //                        .insertValues("'2012-09-17 19:56:47'");
 //                        .insertValues("'2012-09-17 19:56:47.32'+2");
 
-//        https://mariadb.com/kb/en/datetime/#:~:text=MariaDB%20validates%20DATETIME%20literals%20against,invalid%20for%20that%20time%20zone.
+//        IF possible to insert this line before create
 //        "SET time_zone = 'UTC' "
+//        https://mariadb.com/kb/en/datetime/#:~:text=MariaDB%20validates%20DATETIME%20literals%20against,invalid%20for%20that%20time%20zone.
 
         // WHEN
         String playerTableName = playerTable.getTableName();
