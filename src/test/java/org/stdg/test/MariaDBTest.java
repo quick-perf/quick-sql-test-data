@@ -324,9 +324,9 @@ public class MariaDBTest {
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "date Date"
-                )
+                                , "Table"
+                                , "date Date"
+                                )
                         .create()
                         .insertValues("'2012-09-17'");
 
@@ -351,11 +351,11 @@ public class MariaDBTest {
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
-                    , "Table"
-                    , "timestampCol TIMESTAMP"
-                )
-                .create()
-                .insertValues("'2012-09-17 19:56:47.32'");
+                                , "Table"
+                                , "timestampCol TIMESTAMP"
+                                )
+                        .create()
+                        .insertValues("'2012-09-17 19:56:47.32'");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -377,11 +377,14 @@ public class MariaDBTest {
         // GIVEN
         TestTable playerTable =
             buildUniqueTable(DATA_SOURCE
-                    , "Table"
-                    , "col TIMESTAMP"
-            )
-           .create()
-           .insertValues( "CONVERT_TZ('2012-09-17 19:56:47','GMT','America/New_York')");
+                                , "Table"
+                                , "col TIMESTAMP"
+                                )
+                        .create();
+
+        // currently there is no "timestamp with timezone" ( https://jira.mariadb.org/browse/MDEV-10018 )
+        // the trick is to convert the timestamp
+        playerTable.insertValues( "CONVERT_TZ('2012-09-17 19:56:47','GMT','America/New_York')");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -399,17 +402,18 @@ public class MariaDBTest {
         assertThat(insertScript).contains("'2012-09-17 15:56:47.0'");
     }
 
-@Test public void
-should_generate_an_insert_statement_with_a_time_type_with_timezone_type() {
-
+    @Test public void
+    should_generate_an_insert_statement_with_a_time_type_with_timezone_type() {
+    // there isn't a TIME type with TIMEZONE https://mariadb.com/kb/en/time/
+    /*
     // GIVEN
     TestTable playerTable =
         buildUniqueTable(DATA_SOURCE
-            , "Table"
-            , "col TIME WITH TIME ZONE"
+                        ,"Table"
+                        ,"col TIME WITH TIME ZONE"
         )
         .create()
-        .insertValues("CONVERT_TZ('2004-01-01 23:59:59','GMT','MET')");
+        .insertValues("CURRENT_TIME(2)");
 
     // WHEN
     String playerTableName = playerTable.getTableName();
@@ -422,8 +426,8 @@ should_generate_an_insert_statement_with_a_time_type_with_timezone_type() {
     SQL_EXECUTOR.execute(insertScript);
     assertThat(playerTable).withScript(insertScript)
         .hasNumberOfRows(1);
-
-}
+    */
+    }
 
     @Test public void
     should_generate_an_insert_statement_with_a_time_type() {
@@ -431,11 +435,11 @@ should_generate_an_insert_statement_with_a_time_type_with_timezone_type() {
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "col TIME"
-                )
-                        .create()
-                        .insertValues("'23:59:59'");
+                                , "Table"
+                                , "col TIME"
+                                )
+                .create()
+                .insertValues("'23:59:59'");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
