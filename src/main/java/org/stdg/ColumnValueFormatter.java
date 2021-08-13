@@ -13,6 +13,9 @@
 
 package org.stdg;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import org.stdg.dbtype.DatabaseType;
 
 import java.sql.Time;
@@ -38,10 +41,12 @@ class ColumnValueFormatter {
             return buildOracleToTimeStampFunctionFor(columnValue);
         }else if(DatabaseType.HSQLDB.equals(dbType)
                 && isHSQLDBTimestamp(columnValue)){
-//            Timestamp timeStamp = (Timestamp) columnValue;
+            OffsetDateTime offsetDateTime = (OffsetDateTime) columnValue;
             // columnValue = 2008-08-08T20:08:08+08:00
-            System.out.println("timeStamp = " + columnValue.toString());
-            return "'2008-08-08 20:08:08+8:00'";
+            String res = buildHsqlDBDateTimeFormat(offsetDateTime);
+            System.out.println("columnValue = " + columnValue.toString());
+            System.out.println("buildHsqlDBDate = " + res);
+            return res;
         } else if (columnValue instanceof String
                 || columnValue instanceof java.sql.Date
                 || columnValue instanceof Timestamp
@@ -65,6 +70,20 @@ class ColumnValueFormatter {
         Class<?> columnValueClass = columnValue.getClass();
         String classCanonicalName = columnValueClass.getCanonicalName();
         return "java.time.OffsetDateTime".equals(classCanonicalName);
+    }
+
+    /**
+     * @param offsetDateTime format : 2008-08-08T20:08:08+08:00
+     * @return format: "'2008-08-08 20:08:08+8:00'"
+     */
+    private String buildHsqlDBDateTimeFormat(OffsetDateTime offsetDateTime) {
+//        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'Z'");
+        DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd HH:mm:ss")
+            .parseLenient()
+            .appendOffset("+HH:MM", "Z")
+            .toFormatter();
+        return "'" + fmt.format(offsetDateTime) + "'";
     }
 
     private String buildOracleToDateFunctionFor(Timestamp timeStamp) {
