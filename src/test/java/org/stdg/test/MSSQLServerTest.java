@@ -357,4 +357,138 @@ public class MSSQLServerTest {
 
     }
 
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_date_type() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                                , "Table"
+                                , "date Date"
+                                )
+                        .create()
+                        .insertValues("'2012-09-17'");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues("2012-09-17");
+
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_timestamp_type() {
+        // DATETIME2 is a timestamp type an accuracy of 100 nanoseconds
+        TestTable playerTable =
+                buildUniqueTable( DATA_SOURCE
+                                , "Table"
+                                , "timestampCol DATETIME2"
+                                )
+                .create()
+                .insertValues("'2012-09-17 19:56:47.32'");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
+        Assertions.assertThat(insertScript).contains("'2012-09-17 19:56:47.32'");
+    }
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_small_datetime_type() {
+        // SMALLDATETIME is a timestamp type an accuracy of 1 minute
+        TestTable playerTable =
+            buildUniqueTable( DATA_SOURCE
+                            , "Table"
+                            , "timestampCol SMALLDATETIME"
+                            )
+                .create()
+                .insertValues("'2012-09-17 19:56:47.32'");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
+        Assertions.assertThat(insertScript).contains("'2012-09-17 19:57:00.0'");
+    }
+
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_timestamp_with_time_zone_type() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                        , "Table"
+                        , "col DATETIMEOFFSET"
+                        )
+               .create()
+               .insertValues("'2020-12-20 17:20:13 +03:00'");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
+
+        // THEN
+
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1);
+        Assertions.assertThat(insertScript).contains("'2020-12-20 17:20:13 +03:00'");
+    }
+
+
+    @Test public void
+    should_generate_an_insert_statement_with_a_time_type() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable( DATA_SOURCE
+                                , "Table"
+                                , "col TIME"
+                                )
+                        .create()
+                        .insertValues("'23:59:59'");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues("23:59:59");
+
+    }
+
 }
