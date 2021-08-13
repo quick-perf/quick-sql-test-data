@@ -13,6 +13,7 @@
 
 package org.stdg.test;
 
+import java.time.OffsetTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -391,7 +392,35 @@ public class HsqlDbTest {
         Assertions.assertThat(insertScript).contains("'2008-08-08 20:08:08+8:00'");
     }
 
+
     @Test public void
+    should_generate_an_insert_statement_with_a_time_with_timezone_type() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable(DATA_SOURCE
+                    , "Table"
+                    , "col TIME WITH TIME ZONE"
+                )
+                .create()
+                .insertValues("'23:59:59+8:00'");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        assertThat(playerTable).withScript(insertScript)
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues(OffsetTime.parse("23:59:59+08:00"));
+    }
+
+
+@Test public void
     should_generate_an_insert_statement_with_a_time_type() {
 
         // GIVEN
