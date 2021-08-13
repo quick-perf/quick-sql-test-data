@@ -364,9 +364,9 @@ public class MSSQLServerTest {
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "date Date"
-                )
+                                , "Table"
+                                , "date Date"
+                                )
                         .create()
                         .insertValues("'2012-09-17'");
 
@@ -380,8 +380,8 @@ public class MSSQLServerTest {
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
-                .hasNumberOfRows(1)
-                .row(0).hasValues("2012-09-17");
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues("2012-09-17");
 
     }
 
@@ -389,10 +389,10 @@ public class MSSQLServerTest {
     should_generate_an_insert_statement_with_a_timestamp_type() {
         // DATETIME2 is a timestamp type an accuracy of 100 nanoseconds
         TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "timestampCol DATETIME2"
-                        )
+                buildUniqueTable( DATA_SOURCE
+                                , "Table"
+                                , "timestampCol DATETIME2"
+                                )
                 .create()
                 .insertValues("'2012-09-17 19:56:47.32'");
 
@@ -406,18 +406,18 @@ public class MSSQLServerTest {
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
-                .hasNumberOfRows(1);
+                               .hasNumberOfRows(1);
         Assertions.assertThat(insertScript).contains("'2012-09-17 19:56:47.32'");
     }
 
     @Test public void
-    should_generate_an_insert_statement_with_a_smalldatetime_type() {
+    should_generate_an_insert_statement_with_a_small_datetime_type() {
         // SMALLDATETIME is a timestamp type an accuracy of 1 minute
         TestTable playerTable =
-            buildUniqueTable(DATA_SOURCE
-                , "Table"
-                , "timestampCol SMALLDATETIME"
-            )
+            buildUniqueTable( DATA_SOURCE
+                            , "Table"
+                            , "timestampCol SMALLDATETIME"
+                            )
                 .create()
                 .insertValues("'2012-09-17 19:56:47.32'");
 
@@ -438,7 +438,7 @@ public class MSSQLServerTest {
 
     @Test public void
     should_generate_an_insert_statement_with_a_timestamp_with_time_zone_type() {
-        /*
+
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
@@ -447,9 +447,6 @@ public class MSSQLServerTest {
                         )
                .create()
                .insertValues("'2020-12-20 17:20:13 +03:00'");
-//               .insertValues("'20131114 08:54:00 +10:00'");
-//               .insertValues("SYSDATETIMEOFFSET()");
-//             .insertValues("TODATETIMEOFFSET(SYSDATETIME(), '+13:00')");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -463,7 +460,7 @@ public class MSSQLServerTest {
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
                                .hasNumberOfRows(1);
-        */
+
 
 //        java.lang.IllegalStateException: Unable to execute
 //        INSERT INTO Table_779310794(col) VALUES(2021-08-12 22:34:43.8784766 +13:00);
@@ -473,44 +470,16 @@ public class MSSQLServerTest {
 
     }
 
-    @Test public void
-    should_generate_an_insert_statement_with_a_time_with_timezone_type() {
-        // MSL SQL server has no time with time zone
-        // https://docs.microsoft.com/en-gb/sql/t-sql/data-types/data-types-transact-sql?view=sql-server-ver15
-        // a DateTimeOffset is cast as time type
-
-        // GIVEN
-        TestTable playerTable =
-            buildUniqueTable(DATA_SOURCE
-                , "Table"
-                , "col TIME"
-                )
-            .create()
-            .insertValues("cast('2020-12-20 17:20:13 +03:00' AS time)");
-
-        // WHEN
-        String playerTableName = playerTable.getTableName();
-        String select = "SELECT * FROM " + playerTableName;
-        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
-        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
-
-        // THEN
-        playerTable.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript)
-                               .hasNumberOfRows(1);
-
-    }
 
     @Test public void
     should_generate_an_insert_statement_with_a_time_type() {
 
         // GIVEN
         TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "col TIME"
-                )
+                buildUniqueTable( DATA_SOURCE
+                                , "Table"
+                                , "col TIME"
+                                )
                         .create()
                         .insertValues("'23:59:59'");
 
@@ -524,8 +493,8 @@ public class MSSQLServerTest {
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
-                .hasNumberOfRows(1)
-                .row(0).hasValues("23:59:59");
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues("23:59:59");
 
     }
 
