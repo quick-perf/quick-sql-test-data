@@ -40,13 +40,9 @@ class ColumnValueFormatter {
                && isOracleSqlTimestamp(columnValue)) {
             return buildOracleToTimeStampFunctionFor(columnValue);
         }else if(DatabaseType.HSQLDB.equals(dbType)
-                && isHSQLDBTimestamp(columnValue)){
+               && columnValue instanceof OffsetDateTime){
             OffsetDateTime offsetDateTime = (OffsetDateTime) columnValue;
-            // columnValue = 2008-08-08T20:08:08+08:00
-            String res = buildHsqlDBDateTimeFormat(offsetDateTime);
-            System.out.println("columnValue = " + columnValue.toString());
-            System.out.println("buildHsqlDBDate = " + res);
-            return res;
+            return formatForHsqlDBOffsetDateTime(offsetDateTime);
         } else if (columnValue instanceof String
                 || columnValue instanceof java.sql.Date
                 || columnValue instanceof Timestamp
@@ -66,18 +62,7 @@ class ColumnValueFormatter {
         return "microsoft.sql.DateTimeOffset".equals(classCanonicalName);
     }
 
-    private boolean isHSQLDBTimestamp(Object columnValue) {
-        Class<?> columnValueClass = columnValue.getClass();
-        String classCanonicalName = columnValueClass.getCanonicalName();
-        return "java.time.OffsetDateTime".equals(classCanonicalName);
-    }
-
-    /**
-     * @param offsetDateTime format : 2008-08-08T20:08:08+08:00
-     * @return format: "'2008-08-08 20:08:08+8:00'"
-     */
-    private String buildHsqlDBDateTimeFormat(OffsetDateTime offsetDateTime) {
-//        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'Z'");
+    private String formatForHsqlDBOffsetDateTime(OffsetDateTime offsetDateTime) {
         DateTimeFormatter fmt = new DateTimeFormatterBuilder()
             .appendPattern("yyyy-MM-dd HH:mm:ss")
             .parseLenient()

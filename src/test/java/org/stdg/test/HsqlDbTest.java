@@ -317,12 +317,12 @@ public class HsqlDbTest {
 
         // GIVEN
         TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "date Date"
-                )
-                        .create()
-                        .insertValues("'2012-09-17'");
+                buildUniqueTable( DATA_SOURCE
+                                , "Table"
+                                , "date Date"
+                                )
+                .create()
+                .insertValues("'2012-09-17'");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -334,8 +334,8 @@ public class HsqlDbTest {
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
-                .hasNumberOfRows(1)
-                .row(0).hasValues("2012-09-17");
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues("2012-09-17");
 
     }
 
@@ -344,10 +344,10 @@ public class HsqlDbTest {
 
         // GIVEN
         TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "timestampCol TIMESTAMP"
-                )
+                buildUniqueTable( DATA_SOURCE
+                                , "Table"
+                                , "timestampCol TIMESTAMP"
+                                )
                 .create()
                 .insertValues("'2012-09-17 19:56:47.32'");
 
@@ -367,16 +367,16 @@ public class HsqlDbTest {
     }
 
     @Test public void
-    should_generate_an_insert_statement_without_timestamp_type_explicit() {
+    should_generate_an_insert_statement_a_timestamp_without_time_zone_explicit() {
 
         // GIVEN
         TestTable playerTable =
-            buildUniqueTable(DATA_SOURCE
-                , "Table"
-                , "timestampCol TIMESTAMP WITHOUT TIME ZONE"
-            )
-                .create()
-                .insertValues("'2012-09-17 19:56:47.32'");
+            buildUniqueTable( DATA_SOURCE
+                            , "Table"
+                            , "timestampCol TIMESTAMP WITHOUT TIME ZONE"
+                            )
+            .create()
+            .insertValues("'2012-09-17 19:56:47.32'");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -389,7 +389,7 @@ public class HsqlDbTest {
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
                                .hasNumberOfRows(1);
-//            .row(0).hasValues("'2012-09-17 19:56:47.32'");
+                               //.row(0).hasValues("'2012-09-17 2012-09-1719:56:47.32'");
         Assertions.assertThat(insertScript).contains("'2012-09-17 19:56:47.32'");
 
     }
@@ -399,12 +399,12 @@ public class HsqlDbTest {
 
         // GIVEN
         TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                    , "Table"
-                    , "col TIMESTAMP WITH TIME ZONE"
-                )
+                buildUniqueTable( DATA_SOURCE
+                                , "Table"
+                                , "col TIMESTAMP WITH TIME ZONE"
+                                )
                 .create()
-                .insertValues("'2008-08-08 20:08:08+8:00'"); // 2008-08-08 20:08:08+8:00
+                .insertValues("'2008-08-08 20:08:08+8:00'");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -427,9 +427,9 @@ public class HsqlDbTest {
         // GIVEN
         TestTable playerTable =
                 buildUniqueTable(DATA_SOURCE
-                    , "Table"
-                    , "col TIME WITH TIME ZONE"
-                )
+                                , "Table"
+                                , "col TIME WITH TIME ZONE"
+                                )
                 .create()
                 .insertValues("'23:59:59+8:00'");
 
@@ -448,17 +448,17 @@ public class HsqlDbTest {
     }
 
 
-@Test public void
-    should_generate_an_insert_statement_with_a_time_type() {
+    @Test public void
+    should_generate_an_insert_statement_with_a_time_without_time_zone_explicit() {
 
         // GIVEN
         TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                        , "Table"
-                        , "col TIME"
-                )
-                        .create()
-                        .insertValues("'23:59:59'");
+            buildUniqueTable( DATA_SOURCE
+                            , "Table"
+                            , "col TIME WITHOUT TIME ZONE"
+                            )
+            .create()
+            .insertValues("'23:59:59'");
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -470,8 +470,35 @@ public class HsqlDbTest {
         playerTable.recreate();
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
-                .hasNumberOfRows(1)
-                .row(0).hasValues("23:59:59");
+                               .hasNumberOfRows(1)
+                               .row(0).hasValues("23:59:59");
+
+    }
+
+@Test public void
+    should_generate_an_insert_statement_with_a_time_type() {
+
+        // GIVEN
+        TestTable playerTable =
+                buildUniqueTable( DATA_SOURCE
+                                , "Table"
+                                , "col TIME"
+                                )
+                .create()
+                .insertValues("'23:59:59'");
+
+        // WHEN
+        String playerTableName = playerTable.getTableName();
+        String select = "SELECT * FROM " + playerTableName;
+        SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(DATA_SOURCE);
+        String insertScript = sqlTestDataGenerator.generateInsertScriptFor(select);
+
+        // THEN
+        playerTable.recreate();
+        SQL_EXECUTOR.execute(insertScript);
+        assertThat(playerTable).withScript(insertScript)
+                              .hasNumberOfRows(1)
+                              .row(0).hasValues("23:59:59");
 
     }
 
