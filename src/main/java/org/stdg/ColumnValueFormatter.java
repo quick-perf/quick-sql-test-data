@@ -13,6 +13,9 @@
 
 package org.stdg;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import org.stdg.dbtype.DatabaseType;
 
 import java.sql.Time;
@@ -36,6 +39,10 @@ class ColumnValueFormatter {
         } else if(DatabaseType.ORACLE.equals(dbType)
                && isOracleSqlTimestamp(columnValue)) {
             return buildOracleToTimeStampFunctionFor(columnValue);
+        }else if(DatabaseType.HSQLDB.equals(dbType)
+               && columnValue instanceof OffsetDateTime){
+            OffsetDateTime offsetDateTime = (OffsetDateTime) columnValue;
+            return formatForHsqlDBOffsetDateTime(offsetDateTime);
         } else if (columnValue instanceof String
                 || columnValue instanceof java.sql.Date
                 || columnValue instanceof Timestamp
@@ -53,6 +60,15 @@ class ColumnValueFormatter {
         Class<?> columnValueClass = columnValue.getClass();
         String classCanonicalName = columnValueClass.getCanonicalName();
         return "microsoft.sql.DateTimeOffset".equals(classCanonicalName);
+    }
+
+    private String formatForHsqlDBOffsetDateTime(OffsetDateTime offsetDateTime) {
+        DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd HH:mm:ss")
+            .parseLenient()
+            .appendOffset("+HH:MM", "Z")
+            .toFormatter();
+        return "'" + fmt.format(offsetDateTime) + "'";
     }
 
     private String buildOracleToDateFunctionFor(Timestamp timeStamp) {
