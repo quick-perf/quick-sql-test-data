@@ -41,11 +41,18 @@ class ColumnValueFormatter {
                 || columnValue instanceof Timestamp
                 || columnValue instanceof Time
                 || columnValue instanceof OffsetTime
-                || isTimestampWithTimeZoneH2Type(columnValue)) {
+                || isTimestampWithTimeZoneH2Type(columnValue)
+                || isMicrosoftDateTimeOffset(columnValue)) {
             String stringColumnValue = columnValue.toString();
             return "'" + stringColumnValue + "'";
         }
         return columnValue.toString();
+    }
+
+    private boolean isMicrosoftDateTimeOffset(Object columnValue) {
+        Class<?> columnValueClass = columnValue.getClass();
+        String classCanonicalName = columnValueClass.getCanonicalName();
+        return "microsoft.sql.DateTimeOffset".equals(classCanonicalName);
     }
 
     private String buildOracleToDateFunctionFor(Timestamp timeStamp) {
