@@ -435,10 +435,7 @@ public class PostgreSqlTest {
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
                                .hasNumberOfRows(1);
-        // in local time zone
-        Assertions.assertThat(insertScript).contains("'2012-09-17 21:56:47.32'");
-        // test date +- 24h
-        Assertions.assertThat(insertScript).contains("'2012-09-1");
+
     }
 
     @Test public void
