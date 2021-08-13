@@ -460,14 +460,7 @@ public class MSSQLServerTest {
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
                                .hasNumberOfRows(1);
-
-
-//        java.lang.IllegalStateException: Unable to execute
-//        INSERT INTO Table_779310794(col) VALUES(2021-08-12 22:34:43.8784766 +13:00);
-
-//        Caused by: com.microsoft.sqlserver.jdbc.SQLServerException: Incorrect syntax near '17'.
-//            at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:262)
-
+        Assertions.assertThat(insertScript).contains("'2020-12-20 17:20:13 +03:00'");
     }
 
 
