@@ -36,6 +36,12 @@ class ColumnValueFormatter {
         } else if(DatabaseType.ORACLE.equals(dbType)
                && isOracleSqlTimestamp(columnValue)) {
             return buildOracleToTimeStampFunctionFor(columnValue);
+        }else if(DatabaseType.HSQLDB.equals(dbType)
+                && isHSQLDBTimestamp(columnValue)){
+//            Timestamp timeStamp = (Timestamp) columnValue;
+            // columnValue = 2008-08-08T20:08:08+08:00
+            System.out.println("timeStamp = " + columnValue.toString());
+            return "'2008-08-08 20:08:08+8:00'";
         } else if (columnValue instanceof String
                 || columnValue instanceof java.sql.Date
                 || columnValue instanceof Timestamp
@@ -53,6 +59,12 @@ class ColumnValueFormatter {
         Class<?> columnValueClass = columnValue.getClass();
         String classCanonicalName = columnValueClass.getCanonicalName();
         return "microsoft.sql.DateTimeOffset".equals(classCanonicalName);
+    }
+
+    private boolean isHSQLDBTimestamp(Object columnValue) {
+        Class<?> columnValueClass = columnValue.getClass();
+        String classCanonicalName = columnValueClass.getCanonicalName();
+        return "java.time.OffsetDateTime".equals(classCanonicalName);
     }
 
     private String buildOracleToDateFunctionFor(Timestamp timeStamp) {

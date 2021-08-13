@@ -375,7 +375,7 @@ public class HsqlDbTest {
                     , "col TIMESTAMP WITH TIME ZONE"
                 )
                 .create()
-                .insertValues("'2020-12-20 17:20:13+03:00'"); // 2008-08-08 20:08:08+8:00
+                .insertValues("'2008-08-08 20:08:08+8:00'"); // 2008-08-08 20:08:08+8:00
 
         // WHEN
         String playerTableName = playerTable.getTableName();
@@ -388,7 +388,7 @@ public class HsqlDbTest {
         SQL_EXECUTOR.execute(insertScript);
         assertThat(playerTable).withScript(insertScript)
                                .hasNumberOfRows(1);
-        Assertions.assertThat(insertScript).contains("'2020-12-20 17:20:13 +03:00'");
+        Assertions.assertThat(insertScript).contains("'2008-08-08 20:08:08+8:00'");
     }
 
     @Test public void
