@@ -30,7 +30,7 @@ The library automatically:
 * sorts insert statements to accommodate  *foreign key constraints*
 * sorts insert statements following *primary key values*
 
-[Another project](https://github.com/quick-perf/web-sql-test-data-generator#web-sql-test-data-generator) provides a web page to ease the use of the _SQL test data generator_ library.
+_[Another project](https://github.com/quick-perf/web-sql-test-data-generator#web-sql-test-data-generator) provides a web page to ease the use of the _SQL test data generator_ library._
 
 ## How to use the library
 
