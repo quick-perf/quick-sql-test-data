@@ -19,7 +19,7 @@
     <img src="https://codecov.io/gh/quick-perf/sql-test-data-generator/branch/main/graph/badge.svg?token=U475ES0JIL"/>
   </a>
 
-## Why using *SQL test data generator*?
+## Why use *SQL test data generator*?
 Writing datasets with SQL  may be tedious and time-consuming because of database integrity constraints.
 
 *This Java library aims to ease the generation of datasets to test SQL queries. It produces INSERT statements taking account of integrity constraints.*
