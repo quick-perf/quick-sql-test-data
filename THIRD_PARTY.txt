@@ -1,7 +1,7 @@
-SQL test data generator uses:
+Quick SQL test data library uses:
 * JSqlParser licensed under Apache Software License, Version 2.0 (https://github.com/JSQLParser/JSqlParser/blob/master/LICENSE_APACHEV2) or  LGPL V2.1 (https://github.com/JSQLParser/JSqlParser/blob/master/LICENSE_LGPLV21)
 
-SQL test data generator uses only for testing and doesn't ship with:
+Quick SQL test data library uses only for testing and doesn't ship with:
 * JUnit 5 licensed under Eclipse Public License - v 2.0 (https://github.com/junit-team/junit5/blob/main/LICENSE.md)
 * AssertJ licensed under Apache Software License, Version 2.0 (https://github.com/assertj/assertj-core/blob/main/LICENSE.txt)
 * AssertJ-DB licensed under Apache Software License, Version 2.0 (https://github.com/assertj/assertj-db/blob/main/LICENSE.txt)
