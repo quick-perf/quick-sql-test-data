@@ -21,12 +21,12 @@
 
     <description>This Java library aims to ease the generation of datasets to test SQL queries. It produces INSERT statements taking account of integrity constraints.</description>
 
-    <url>https://github.com/quick-perf/sql-test-data-generator</url>
+    <url>https://github.com/quick-perf/quick-sql-test-data</url>
 
     <groupId>org.quickperf</groupId>
-    <artifactId>sql-test-data-generator</artifactId>
+    <artifactId>quick-sql-test-data</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <name>SQL test data generator</name>
+    <name>Quick SQL test data</name>
     <inceptionYear>2021</inceptionYear>
 
     <properties>
@@ -294,7 +294,7 @@
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/quick-perf/sql-test-data-generator</url>
+        <url>https://github.com/quick-perf/quick-sql-test-data</url>
     </issueManagement>
 
     <profiles>
@@ -385,9 +385,9 @@
     </profiles>
 
     <scm>
-        <connection>scm:git:https://github.com/quick-perf/sql-test-data-generator.git</connection>
-        <developerConnection>scm:git:git@github.com:quick-perf/sql-test-data-generator.git</developerConnection>
-        <url>https://github.com/quick-perf/sql-test-data-generator</url>
+        <connection>scm:git:https://github.com/quick-perf/quick-sql-test-data.git</connection>
+        <developerConnection>scm:git:git@github.com:quick-perf/quick-sql-test-data.git</developerConnection>
+        <url>https://github.com/quick-perf/quick-sql-test-data</url>
         <tag>HEAD</tag>
     </scm>
 

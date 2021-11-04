@@ -1,25 +1,25 @@
-# SQL test data generator
+# Quick SQL test data
 
-  <a href="https://search.maven.org/artifact/org.quickperf/sql-test-data-generator">
-    <img src="https://maven-badges.herokuapp.com/maven-central/org.quickperf/sql-test-data-generator/badge.svg"
+  <a href="https://search.maven.org/artifact/org.quickperf/quick-sql-test-data">
+    <img src="https://maven-badges.herokuapp.com/maven-central/org.quickperf/quick-sql-test-data/badge.svg"
          alt="Maven Central">
   </a>
   &nbsp;&nbsp;
-  <a href="https://github.com/quick-perf/sql-test-data-generator/blob/master/LICENSE.txt">
+  <a href="https://github.com/quick-perf/quick-sql-test-data/blob/master/LICENSE.txt">
     <img src="https://img.shields.io/badge/license-Apache2-blue.svg"
          alt = "License">
   </a>
   &nbsp;&nbsp;
-  <a href="https://github.com/quick-perf/sql-test-data-generator/actions?query=workflow%3ACI">
-    <img src="https://img.shields.io/github/workflow/status/quick-perf/sql-test-data-generator/CI"
+  <a href="https://github.com/quick-perf/quick-sql-test-data/actions?query=workflow%3ACI">
+    <img src="https://img.shields.io/github/workflow/status/quick-perf/quick-sql-test-data/CI"
          alt = "Build Status">
   </a>
   &nbsp;
-  <a href="https://codecov.io/gh/quick-perf/sql-test-data-generator">
-    <img src="https://codecov.io/gh/quick-perf/sql-test-data-generator/branch/main/graph/badge.svg?token=U475ES0JIL"/>
+  <a href="https://codecov.io/gh/quick-perf/quick-sql-test-data">
+    <img src="https://codecov.io/gh/quick-perf/quick-sql-test-data/branch/main/graph/badge.svg?token=U475ES0JIL"/>
   </a>
 
-## Why use *SQL test data generator*?
+## Why use *Quick SQL test data*?
 Writing datasets with SQL  may be tedious and time-consuming because of database integrity constraints.
 
 *This Java library aims to ease the generation of datasets to test SQL queries. It produces INSERT statements taking account of integrity constraints.*
@@ -30,7 +30,7 @@ The library automatically:
 * sorts insert statements to accommodate  *foreign key constraints*
 * sorts insert statements following *primary key values*
 
-_[Another project](https://github.com/quick-perf/web-sql-test-data-generator#web-sql-test-data-generator) provides a web page to ease the use of the _SQL test data generator_ library._
+_[Another project](https://github.com/quick-perf/quick-sql-test-data-web) provides a web page to ease the use of the _Quick SQL test data_ library._
 
 ## How to use the library
 
@@ -40,14 +40,14 @@ With Maven, you have to add the following dependency:
 
 <dependency>
     <groupId>org.quickperf</groupId>
-    <artifactId>sql-test-data-generator</artifactId>
+    <artifactId>quick-sql-test-data</artifactId>
     <version>0.1-SNAPSHOT</version>
 </dependency>
 ```
 
-You can generate the insert statements with the help of an instance of `org.stdg.SqlTestDataGenerator` class.
+You can generate the insert statements with the help of an instance of `org.qstd.QuickSqlTestData` class.
 
-_SQL test data generator_ works with:
+_Quick SQL test data_ works with:
 * PostgreSQL
 * Oracle
 * MariaDB
@@ -66,10 +66,10 @@ This case happens when you develop SQL queries with *Test-Driven Development* (T
 
 You can read below an example where we define a dataset row for which we generate the INSERT statement:
 ```java
-SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(dataSource);
+SqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(dataSource);
 DatasetRow datasetRow = DatasetRow.ofTable("Player")
                                   .addColumnValue("lastName","Pogba");
-List<String> insertStatements = sqlTestDataGenerator.generateInsertListFor(datasetRow);
+List<String> insertStatements = quickSqlTestData.generateInsertListFor(datasetRow);
 
 System.out.println(insertStatements);
 ```
@@ -84,9 +84,9 @@ FIRSTNAME column owns a NOT NULL constraint. For this reason, the library has re
 Let's take an example:
 
 ```java
-SqlTestDataGenerator sqlTestDataGenerator = SqlTestDataGenerator.buildFrom(dataSource);
+QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(dataSource);
 String selectStatement = "SELECT * FROM Player WHERE LASTNAME = 'Pogba'";
-String insertScript = sqlTestDataGenerator.generateInsertScriptFor(selectStatement);
+String insertScript = quickSqlTestData.generateInsertScriptFor(selectStatement);
 System.out.println(insertScript);
 ```
 
