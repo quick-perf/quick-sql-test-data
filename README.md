@@ -66,7 +66,7 @@ This case happens when you develop SQL queries with *Test-Driven Development* (T
 
 You can read below an example where we define a dataset row for which we generate the INSERT statement:
 ```java
-SqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(dataSource);
+QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(dataSource);
 DatasetRow datasetRow = DatasetRow.ofTable("Player")
                                   .addColumnValue("lastName","Pogba");
 List<String> insertStatements = quickSqlTestData.generateInsertListFor(datasetRow);
