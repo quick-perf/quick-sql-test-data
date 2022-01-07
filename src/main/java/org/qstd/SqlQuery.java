@@ -18,17 +18,29 @@ import java.util.*;
 
 import static java.util.stream.Collectors.joining;
 
+/**
+ * Class to represent an SQL query
+ */
 public class SqlQuery {
 
     private final String queryAsString;
 
     private final List<Object> parameters;
 
+    /**
+     * Constructor to instantiate an SQL Query from an SQL query as String
+     * @param queryAsString An SQL query as string
+     */
     public SqlQuery(String queryAsString) {
         this.queryAsString = queryAsString;
         this.parameters = Collections.emptyList();
     }
 
+    /**
+     * Constructor to instantiate an SQL query from an SQL query with bind parameters and its bind parameter values
+     * @param queryAsString An SQL query as String with bind parameters
+     * @param parameters Bind parameter values
+     */
     public SqlQuery(String queryAsString, List<Object> parameters) {
         this.queryAsString = queryAsString;
         this.parameters = parameters;
