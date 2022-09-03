@@ -36,7 +36,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <license.dir>${basedir}</license.dir>
         <currentYear>2022</currentYear>
-        <testcontainers.version>1.16.0</testcontainers.version>
+        <testcontainers.version>1.17.3</testcontainers.version>
     </properties>
 
     <dependencyManagement>
@@ -44,7 +44,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.8.1</version>
+                <version>5.8.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -91,13 +91,13 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>2.7.2</version>
+            <version>3.0.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>9.2.0.jre8</version>
+            <version>11.2.0.jre8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -109,7 +109,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.19</version>
+            <version>42.5.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -121,7 +121,7 @@
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
-            <version>19.7.0.0</version>
+            <version>21.7.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -152,7 +152,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.21.0</version>
+            <version>3.23.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -170,7 +170,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.7</version>
+            <version>1.2.11</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -304,7 +304,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -332,7 +332,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.4.1</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -359,9 +359,10 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>3.0.0-M1</version>
+                        <version>3.0.0-M6</version>
                         <configuration>
-                            <allowTimestampedSnapshots>true</allowTimestampedSnapshots> <!--Because of junit4-spring-base-tests-->
+                            <allowTimestampedSnapshots>true
+                            </allowTimestampedSnapshots> <!--Because of junit4-spring-base-tests-->
                             <autoVersionSubmodules>true</autoVersionSubmodules>
                             <useReleaseProfile>false</useReleaseProfile>
                             <releaseProfiles>release</releaseProfiles>
