@@ -36,6 +36,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <license.dir>${basedir}</license.dir>
         <currentYear>2022</currentYear>
+        <project.build.outputTimestamp>10</project.build.outputTimestamp>
         <testcontainers.version>1.17.3</testcontainers.version>
     </properties>
 
