@@ -41,7 +41,7 @@ With Maven, you have to add the following dependency:
 <dependency>
     <groupId>org.quickperf</groupId>
     <artifactId>quick-sql-test-data</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
 </dependency>
 ```
 
