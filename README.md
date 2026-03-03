@@ -1,7 +1,7 @@
 # Quick SQL test data
 
   <a href="https://search.maven.org/artifact/org.quickperf/quick-sql-test-data">
-    <img src="https://maven-badges.herokuapp.com/maven-central/org.quickperf/quick-sql-test-data/badge.svg"
+    <img src="https://img.shields.io/maven-central/v/org.quickperf/quick-sql-test-data.svg"
          alt="Maven Central">
   </a>
   &nbsp;&nbsp;
