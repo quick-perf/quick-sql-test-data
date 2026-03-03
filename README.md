@@ -10,8 +10,8 @@
          alt = "License">
   </a>
   &nbsp;&nbsp;
-  <a href="https://github.com/quick-perf/quick-sql-test-data/actions?query=workflow%3ACI">
-    <img src="https://img.shields.io/github/workflow/status/quick-perf/quick-sql-test-data/CI"
+  <a href="https://github.com/quick-perf/quick-sql-test-data/actions?query=workflow%3ACI+branch%3Amain">
+    <img src="https://github.com/quick-perf/quick-sql-test-data/actions/workflows/CI.yml/badge.svg?branch=main"
          alt = "Build Status">
   </a>
   &nbsp;
