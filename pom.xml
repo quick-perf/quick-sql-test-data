@@ -268,7 +268,7 @@
                         </goals>
                         <configuration>
                             <rules>
-                                <banCircularDependencies/>
+                                <banCircularDependencies />
                                 <enforceBytecodeVersion>
                                     <maxJdkVersion>1.8</maxJdkVersion>
                                     <ignoreClasses>
