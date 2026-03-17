@@ -302,7 +302,7 @@
             <activation>
                 <!-- google-java-format 1.25.2 requires JVM 17+ to run
                      but formats Java 8 source code correctly -->
-                <jdk>[17,)</jdk>
+                <jdk>17</jdk>
             </activation>
             <build>
                 <plugins>
