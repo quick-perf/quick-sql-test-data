@@ -14,6 +14,5 @@ package org.qstd;
 
 public interface ColumnsMappingsFinder {
 
-    ColumnsMappingGroup findColumnsMappingsOf(String tableName);
-
+  ColumnsMappingGroup findColumnsMappingsOf(String tableName);
 }

@@ -12,47 +12,44 @@
  */
 package org.qstd.dbtype;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import javax.sql.DataSource;
 import org.qstd.ColumnsMappingGroup;
 import org.qstd.DatabaseMetadataFinder;
 import org.qstd.ReferencedTableSet;
 
-import javax.sql.DataSource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 class DefaultDatabaseMetadataFinder implements DatabaseMetadataFinder {
 
+  private final DefaultNotNullColumnsFinder defaultNotNullColumnsFinder;
 
-    private final DefaultNotNullColumnsFinder defaultNotNullColumnsFinder;
+  public DefaultDatabaseMetadataFinder(DataSource dataSource) {
+    this.defaultNotNullColumnsFinder = new DefaultNotNullColumnsFinder(dataSource);
+  }
 
-    public DefaultDatabaseMetadataFinder(DataSource dataSource) {
-        this.defaultNotNullColumnsFinder = new DefaultNotNullColumnsFinder(dataSource);
-    }
+  @Override
+  public List<String> findDatabaseColumnOrdersOf(String tableName) {
+    return Collections.emptyList();
+  }
 
-    @Override
-    public List<String> findDatabaseColumnOrdersOf(String tableName) {
-        return Collections.emptyList();
-    }
+  @Override
+  public ReferencedTableSet findReferencedTablesOf(String tableName) {
+    return ReferencedTableSet.NONE;
+  }
 
-    @Override
-    public ReferencedTableSet findReferencedTablesOf(String tableName) {
-        return ReferencedTableSet.NONE;
-    }
+  @Override
+  public Collection<String> findNotNullColumnsOf(String tableName) {
+    return defaultNotNullColumnsFinder.findNotNullColumnsOf(tableName);
+  }
 
-    @Override
-    public Collection<String> findNotNullColumnsOf(String tableName) {
-        return defaultNotNullColumnsFinder.findNotNullColumnsOf(tableName);
-    }
+  @Override
+  public ColumnsMappingGroup findColumnsMappingsOf(String tableName) {
+    return ColumnsMappingGroup.NO_MAPPING;
+  }
 
-    @Override
-    public ColumnsMappingGroup findColumnsMappingsOf(String tableName) {
-        return ColumnsMappingGroup.NO_MAPPING;
-    }
-
-    @Override
-    public List<String> findPrimaryColumnsOf(String tableName) {
-        return Collections.emptyList();
-    }
-
+  @Override
+  public List<String> findPrimaryColumnsOf(String tableName) {
+    return Collections.emptyList();
+  }
 }

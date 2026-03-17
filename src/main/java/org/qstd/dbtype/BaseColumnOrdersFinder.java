@@ -12,11 +12,6 @@
  */
 package org.qstd.dbtype;
 
-import org.qstd.ColumnOrdersFinder;
-import org.qstd.PreparedStatementBuilder;
-import org.qstd.SqlQuery;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,38 +19,42 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.sql.DataSource;
+import org.qstd.ColumnOrdersFinder;
+import org.qstd.PreparedStatementBuilder;
+import org.qstd.SqlQuery;
 
 class BaseColumnOrdersFinder implements ColumnOrdersFinder {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    private final SqlQuery notNullColumnsQuery;
+  private final SqlQuery notNullColumnsQuery;
 
-    BaseColumnOrdersFinder(DataSource dataSource, SqlQuery notNullColumnsQuery) {
-        this.dataSource = dataSource;
-        this.notNullColumnsQuery = notNullColumnsQuery;
+  BaseColumnOrdersFinder(DataSource dataSource, SqlQuery notNullColumnsQuery) {
+    this.dataSource = dataSource;
+    this.notNullColumnsQuery = notNullColumnsQuery;
+  }
+
+  @Override
+  public List<String> findDatabaseColumnOrdersOf(String tableName) {
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement columnOrderStatement =
+            PreparedStatementBuilder.buildFrom(notNullColumnsQuery, connection)) {
+      columnOrderStatement.setString(1, tableName);
+      ResultSet queryResult = columnOrderStatement.executeQuery();
+      return findColumnOrderFrom(queryResult);
+    } catch (SQLException sqlException) {
+      sqlException.printStackTrace();
     }
+    return Collections.emptyList();
+  }
 
-    @Override
-    public List<String> findDatabaseColumnOrdersOf(String tableName) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement columnOrderStatement = PreparedStatementBuilder.buildFrom(notNullColumnsQuery, connection)) {
-            columnOrderStatement.setString(1, tableName);
-            ResultSet queryResult = columnOrderStatement.executeQuery();
-            return findColumnOrderFrom(queryResult);
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-        return Collections.emptyList();
+  private List<String> findColumnOrderFrom(ResultSet queryResult) throws SQLException {
+    List<String> columnOrder = new ArrayList<>();
+    while (queryResult.next()) {
+      String columnName = queryResult.getString(3);
+      columnOrder.add(columnName);
     }
-
-    private List<String> findColumnOrderFrom(ResultSet queryResult) throws SQLException {
-        List<String> columnOrder = new ArrayList<>();
-        while (queryResult.next()) {
-            String columnName = queryResult.getString(3);
-            columnOrder.add(columnName);
-        }
-        return columnOrder;
-    }
-
+    return columnOrder;
+  }
 }

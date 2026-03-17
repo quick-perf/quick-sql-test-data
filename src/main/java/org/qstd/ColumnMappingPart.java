@@ -14,18 +14,17 @@ package org.qstd;
 
 public class ColumnMappingPart {
 
-    final String tableName;
-    final String tableColumn;
-    private final String tableSchema;
+  final String tableName;
+  final String tableColumn;
+  private final String tableSchema;
 
-    public ColumnMappingPart(String tableSchema, String tableName, String tableColumn) {
-        this.tableSchema = tableSchema;
-        this.tableName = tableName;
-        this.tableColumn = tableColumn;
-    }
+  public ColumnMappingPart(String tableSchema, String tableName, String tableColumn) {
+    this.tableSchema = tableSchema;
+    this.tableName = tableName;
+    this.tableColumn = tableColumn;
+  }
 
-    boolean hasColumn(String columnName) {
-        return tableColumn.equals(columnName);
-    }
-
+  boolean hasColumn(String columnName) {
+    return tableColumn.equals(columnName);
+  }
 }

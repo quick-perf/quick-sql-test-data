@@ -12,27 +12,26 @@
  */
 package org.qstd;
 
-import java.util.Collection;
-
 import static java.util.Collections.emptyList;
+
+import java.util.Collection;
 
 public class ReferencedTableSet {
 
-    public static final ReferencedTableSet NONE = new ReferencedTableSet(emptyList());
+  public static final ReferencedTableSet NONE = new ReferencedTableSet(emptyList());
 
-    private final Collection<ReferencedTable> referencedTablesOfTable;
+  private final Collection<ReferencedTable> referencedTablesOfTable;
 
-    public ReferencedTableSet(Collection<ReferencedTable> referencedTablesOfTable) {
-        this.referencedTablesOfTable = referencedTablesOfTable;
+  public ReferencedTableSet(Collection<ReferencedTable> referencedTablesOfTable) {
+    this.referencedTablesOfTable = referencedTablesOfTable;
+  }
+
+  boolean referencesTable(String tableName) {
+    for (ReferencedTable referencedTable : referencedTablesOfTable) {
+      if (referencedTable.references(tableName)) {
+        return true;
+      }
     }
-
-    boolean referencesTable(String tableName) {
-        for (ReferencedTable referencedTable : referencedTablesOfTable) {
-            if (referencedTable.references(tableName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    return false;
+  }
 }

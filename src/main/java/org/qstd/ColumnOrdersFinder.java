@@ -16,6 +16,5 @@ import java.util.List;
 
 public interface ColumnOrdersFinder {
 
-    List<String> findDatabaseColumnOrdersOf(String tableName);
-
+  List<String> findDatabaseColumnOrdersOf(String tableName);
 }

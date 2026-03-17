@@ -12,10 +12,9 @@
  */
 package org.qstd;
 
+import java.util.function.Function;
 import org.qstd.dbtype.DatabaseMetadataFinderFactory;
 import org.qstd.dbtype.DatabaseMetadataFinderWithCache;
-
-import java.util.function.Function;
 
 /**
  * Interface describing the methods needed by the library to retrieve some database metadata.
@@ -23,14 +22,14 @@ import java.util.function.Function;
  * @see DatabaseMetadataFinderFactory
  * @see DatabaseMetadataFinderWithCache
  */
-public interface DatabaseMetadataFinder extends NotNullColumnsFinder
-                                              , ColumnOrdersFinder
-                                              , ReferencedTablesFinder
-                                              , ColumnsMappingsFinder
-                                              , PrimaryKeyColumnsFinder {
+public interface DatabaseMetadataFinder
+    extends NotNullColumnsFinder,
+        ColumnOrdersFinder,
+        ReferencedTablesFinder,
+        ColumnsMappingsFinder,
+        PrimaryKeyColumnsFinder {
 
-    default Function<String, String> getFunctionToHaveMetadataTableName() {
-        return tableName -> tableName;
-    }
-
+  default Function<String, String> getFunctionToHaveMetadataTableName() {
+    return tableName -> tableName;
+  }
 }

@@ -14,6 +14,5 @@ package org.qstd;
 
 public interface ReferencedTablesFinder {
 
-    ReferencedTableSet findReferencedTablesOf(String tableName);
-
+  ReferencedTableSet findReferencedTablesOf(String tableName);
 }

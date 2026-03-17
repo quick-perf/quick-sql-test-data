@@ -16,6 +16,5 @@ import java.util.List;
 
 public interface PrimaryKeyColumnsFinder {
 
-    List<String> findPrimaryColumnsOf(String tableName);
-
+  List<String> findPrimaryColumnsOf(String tableName);
 }

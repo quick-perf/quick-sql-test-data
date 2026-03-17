@@ -12,53 +12,50 @@
  */
 package org.qstd.dbtype;
 
-import org.qstd.DatabaseMetadataFinder;
-
-import javax.sql.DataSource;
-
 import static org.qstd.dbtype.DatabaseType.*;
 
-/**
- * Factory to create an instance of {@link org.qstd.DatabaseMetadataFinder}.
- */
+import javax.sql.DataSource;
+import org.qstd.DatabaseMetadataFinder;
+
+/** Factory to create an instance of {@link org.qstd.DatabaseMetadataFinder}. */
 public class DatabaseMetadataFinderFactory {
 
-    private DatabaseMetadataFinderFactory() { }
+  private DatabaseMetadataFinderFactory() {}
 
-    /**
-     * Creates a DatabaseMetadataFinder
-     * @param dataSource A data source
-     * @param dbType A database type
-     * @return An instance of DatabaseMetadataFinder
-     */
-    public static DatabaseMetadataFinder createDatabaseMetadataFinderFrom(DataSource dataSource, DatabaseType dbType) {
+  /**
+   * Creates a DatabaseMetadataFinder
+   *
+   * @param dataSource A data source
+   * @param dbType A database type
+   * @return An instance of DatabaseMetadataFinder
+   */
+  public static DatabaseMetadataFinder createDatabaseMetadataFinderFrom(
+      DataSource dataSource, DatabaseType dbType) {
 
-        if(dbType.equals(H2)) {
-            return new H2MetadataFinder(dataSource);
-        }
-
-        if(dbType.equals(HSQLDB)) {
-            return new HsqlDbMetadataFinder(dataSource);
-        }
-
-        if(dbType.equals(POSTGRE_SQL)) {
-            return new PostgreSqlMetadataFinder(dataSource);
-        }
-
-        if (dbType.equals(MARIA_DB) || dbType.equals(MY_SQL)) {
-            return new MariaDBMySQLMetadataFinder(dataSource);
-        }
-
-        if(dbType.equals(MICROSOFT_SQL_SERVER)) {
-            return new MSSQLServerMetadataFinder(dataSource);
-        }
-
-        if(dbType.equals(ORACLE)) {
-            return new OracleMetadataFinder(dataSource);
-        }
-
-        return new DefaultDatabaseMetadataFinder(dataSource);
-
+    if (dbType.equals(H2)) {
+      return new H2MetadataFinder(dataSource);
     }
 
+    if (dbType.equals(HSQLDB)) {
+      return new HsqlDbMetadataFinder(dataSource);
+    }
+
+    if (dbType.equals(POSTGRE_SQL)) {
+      return new PostgreSqlMetadataFinder(dataSource);
+    }
+
+    if (dbType.equals(MARIA_DB) || dbType.equals(MY_SQL)) {
+      return new MariaDBMySQLMetadataFinder(dataSource);
+    }
+
+    if (dbType.equals(MICROSOFT_SQL_SERVER)) {
+      return new MSSQLServerMetadataFinder(dataSource);
+    }
+
+    if (dbType.equals(ORACLE)) {
+      return new OracleMetadataFinder(dataSource);
+    }
+
+    return new DefaultDatabaseMetadataFinder(dataSource);
+  }
 }

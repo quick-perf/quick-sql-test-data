@@ -12,306 +12,313 @@
  */
 package org.qstd.test;
 
-import org.junit.jupiter.api.Test;
-import org.qstd.QuickSqlTestData;
-
-import java.util.Random;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.qstd.test.TestTable.*;
 import static org.qstd.test.TestTable.TestTableAssert.assertThat;
 
+import java.util.Random;
+import org.junit.jupiter.api.Test;
+import org.qstd.QuickSqlTestData;
+
 public class H2Test extends H2Config {
 
-    @Test public void
-    should_generate_an_insert_statement_with_columns_declared_in_the_same_order_as_in_the_table() {
+  @Test
+  public void
+      should_generate_an_insert_statement_with_columns_declared_in_the_same_order_as_in_the_table() {
 
-        // GIVEN
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "player"
-                                , "id bigint"
-                                + ", firstName varchar(255)"
-                                + ", lastName varchar(255)"
-                                )
-                .create()
-                .insertValues("1, 'Paul', 'Pogba'");
+    // GIVEN
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "player",
+                "id bigint" + ", firstName varchar(255)" + ", lastName varchar(255)")
+            .create()
+            .insertValues("1, 'Paul', 'Pogba'");
 
-        String playerTableName = playerTable.getTableName();
-        String select = "SELECT * FROM " + playerTableName;
+    String playerTableName = playerTable.getTableName();
+    String select = "SELECT * FROM " + playerTableName;
 
-        // WHEN
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(select);
+    // WHEN
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(select);
 
-        // THEN
-        assertThat(insertScript).contains("ID, FIRSTNAME, LASTNAME");
+    // THEN
+    assertThat(insertScript).contains("ID, FIRSTNAME, LASTNAME");
 
-        playerTable.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript)
-                               .hasNumberOfRows(1);
+    playerTable.recreate();
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
+  }
 
-    }
+  @Test
+  public void should_generate_an_insert_statement_with_not_null_columns() {
 
-    @Test public void
-    should_generate_an_insert_statement_with_not_null_columns() {
+    // GIVEN
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "  id bigint not null"
+                    + ", firstName varchar(255) not null"
+                    + ", lastName varchar(255) not null")
+            .create()
+            .insertValues("1, 'Paul', 'Pogba'");
 
-        // GIVEN
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Player"
-                                , "  id bigint not null"
-                                + ", firstName varchar(255) not null"
-                                + ", lastName varchar(255) not null"
-                                )
-                .create()
-                .insertValues("1, 'Paul', 'Pogba'");
+    String playerTableName = playerTable.getTableName();
+    String select = "SELECT id FROM " + playerTableName + " WHERE lastName = 'Pogba'";
 
-        String playerTableName = playerTable.getTableName();
-        String select = "SELECT id FROM " + playerTableName + " WHERE lastName = 'Pogba'";
+    // WHEN
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(select);
 
-        // WHEN
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(select);
+    // THEN
+    playerTable.recreate();
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(playerTable)
+        .withScript(insertScript)
+        .hasNumberOfRows(1)
+        .row(0)
+        .hasValues(1, "Paul", "Pogba");
+  }
 
-        // THEN
-        playerTable.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript)
-                               .hasNumberOfRows(1)
-                               .row(0).hasValues(1, "Paul", "Pogba");
+  @Test
+  public void
+      should_generate_an_insert_statement_with_not_null_columns_from_a_statement_selecting_a_null_column() {
 
-    }
+    // GIVEN
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "  id bigint not null"
+                    + ", firstName varchar(255) not null"
+                    + ", lastName varchar(255) not null"
+                    + ", team_id bigint")
+            .create()
+            .insertValues("1, 'Paul', 'Pogba', NULL");
 
-    @Test public void
-    should_generate_an_insert_statement_with_not_null_columns_from_a_statement_selecting_a_null_column() {
+    String playerTableName = playerTable.getTableName();
+    String select = "SELECT team_id FROM " + playerTableName + " WHERE lastName = 'Pogba'";
 
-        // GIVEN
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Player"
-                                , "  id bigint not null"
-                                + ", firstName varchar(255) not null"
-                                + ", lastName varchar(255) not null"
-                                + ", team_id bigint"
-                                )
-                .create()
-                .insertValues("1, 'Paul', 'Pogba', NULL");
+    // WHEN
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(select);
 
-        String playerTableName = playerTable.getTableName();
-        String select = "SELECT team_id FROM " + playerTableName + " WHERE lastName = 'Pogba'";
+    // THEN
+    playerTable.recreate();
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(playerTable)
+        .withScript(insertScript)
+        .hasNumberOfRows(1)
+        .row(0)
+        .hasValues(1, "Paul", "Pogba", null);
+  }
 
-        // WHEN
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(select);
+  @Test
+  public void
+      should_generate_an_insert_statement_with_not_null_columns_from_a_statement_selecting_2_columns() {
 
-        // THEN
-        playerTable.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript)
-                               .hasNumberOfRows(1)
-                               .row(0).hasValues(1, "Paul", "Pogba", null);
+    // GIVEN
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "  id bigint not null"
+                    + ", firstName varchar(255) not null"
+                    + ", lastName varchar(255) not null"
+                    + ", team_id bigint")
+            .create()
+            .insertValues("1, 'Paul', 'Pogba', NULL");
 
-    }
+    // WHEN
+    String playerTableName = playerTable.getTableName();
+    String select = "SELECT id, team_id  FROM " + playerTableName + " WHERE lastName = 'Pogba'";
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(select);
 
-    @Test public void
-    should_generate_an_insert_statement_with_not_null_columns_from_a_statement_selecting_2_columns() {
+    // THEN
+    playerTable.recreate();
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(playerTable)
+        .withScript(insertScript)
+        .hasNumberOfRows(1)
+        .row(0)
+        .hasValues(1, "Paul", "Pogba", null);
+  }
 
-        // GIVEN
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Player"
-                                , "  id bigint not null"
-                                + ", firstName varchar(255) not null"
-                                + ", lastName varchar(255) not null"
-                                + ", team_id bigint"
-                                )
-                .create()
-                .insertValues("1, 'Paul', 'Pogba', NULL");
+  private int generateRandomPositiveInt() {
+    Random random = new Random();
+    return Math.abs(random.nextInt());
+  }
 
-        // WHEN
-        String playerTableName = playerTable.getTableName();
-        String select = "SELECT id, team_id  FROM " + playerTableName + " WHERE lastName = 'Pogba'";
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(select);
+  @Test
+  public void should_add_rows_related_to_a_not_null_foreign_key() {
 
-        // THEN
-        playerTable.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript)
-                               .hasNumberOfRows(1)
-                               .row(0).hasValues(1, "Paul", "Pogba", null);
+    // GIVEN
+    TestTable teamTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Team",
+                " id bigint not null" + ",  name varchar(255)" + ",  primary key (id)")
+            .create()
+            .insertValues("1, 'Manchester United'");
 
-    }
+    String playerTableConstraint =
+        "add constraint player_team_fk"
+            + generateRandomPositiveInt()
+            + " foreign key (team_id)"
+            + " references "
+            + teamTable.getTableName();
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "id bigint not null"
+                    + ", firstName varchar(255)"
+                    + ", lastName varchar(255)"
+                    + ", team_id bigint not null"
+                    + ", primary key (id)")
+            .create()
+            .alter(playerTableConstraint)
+            .insertValues("1, 'Paul', 'Pogba', 1");
 
-    private int generateRandomPositiveInt() {
-        Random random = new Random();
-        return Math.abs(random.nextInt());
-    }
+    String playerSelect = "SELECT * FROM " + playerTable.getTableName();
 
-    @Test public void
-    should_add_rows_related_to_a_not_null_foreign_key() {
+    // WHEN
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(playerSelect);
 
-        // GIVEN
-        TestTable teamTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Team"
-                                ," id bigint not null" +
-                                ",  name varchar(255)" +
-                                ",  primary key (id)"
-                               )
-               .create()
-               .insertValues("1, 'Manchester United'");
+    // THEN
+    playerTable.drop();
+    teamTable.drop().create();
+    playerTable.create().alter(playerTableConstraint);
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
+    assertThat(teamTable).withScript(insertScript).hasNumberOfRows(1);
+  }
 
-        String playerTableConstraint = "add constraint player_team_fk" + generateRandomPositiveInt()
-                                     + " foreign key (team_id)"
-                                     + " references " + teamTable.getTableName();
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Player"
-                                , "id bigint not null"
-                                + ", firstName varchar(255)"
-                                + ", lastName varchar(255)"
-                                + ", team_id bigint not null"
-                                + ", primary key (id)"
-                                )
-                .create()
-                .alter(playerTableConstraint)
-                .insertValues("1, 'Paul', 'Pogba', 1");
+  @Test
+  public void should_add_not_null_columns_to_rows_related_to_a_not_null_foreign_key() {
 
-        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
+    // GIVEN
+    TestTable teamTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Team",
+                " id bigint not null" + ",  name varchar(255) not null" + ",  primary key (id)")
+            .create()
+            .insertValues("1, 'Manchester United'");
 
-        // WHEN
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(playerSelect);
+    String playerTableConstraint =
+        "add constraint player_team_fk"
+            + generateRandomPositiveInt()
+            + " foreign key (team_id)"
+            + " references "
+            + teamTable.getTableName();
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "id bigint not null"
+                    + ", firstName varchar(255)"
+                    + ", lastName varchar(255)"
+                    + ", team_id bigint not null"
+                    + ", primary key (id)")
+            .create()
+            .alter(playerTableConstraint)
+            .insertValues("1, 'Paul', 'Pogba', 1");
 
-        // THEN
-        playerTable.drop();
-        teamTable.drop().create();
-        playerTable.create().alter(playerTableConstraint);
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript)
-                               .hasNumberOfRows(1);
-        assertThat(teamTable).withScript(insertScript)
-                             .hasNumberOfRows(1);
+    String playerSelect = "SELECT * FROM " + playerTable.getTableName();
 
-    }
+    // WHEN
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(playerSelect);
 
-    @Test public void
-    should_add_not_null_columns_to_rows_related_to_a_not_null_foreign_key() {
+    // THEN
+    playerTable.drop();
+    teamTable.drop().create();
+    playerTable.create().alter(playerTableConstraint);
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
+    assertThat(teamTable)
+        .hasNumberOfRows(1)
+        .row(0)
+        .column(0)
+        .hasValues(1)
+        .row(0)
+        .column(1)
+        .hasValues("Manchester United");
+  }
 
-        // GIVEN
-        TestTable teamTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Team"
-                                ," id bigint not null" +
-                                 ",  name varchar(255) not null" +
-                                 ",  primary key (id)")
-                .create()
-                .insertValues("1, 'Manchester United'");
+  @Test
+  public void should_add_joined_rows_of_joined_rows_because_of_not_null_foreign_keys() {
 
-        String playerTableConstraint = "add constraint player_team_fk" + generateRandomPositiveInt()
-                                     + " foreign key (team_id)"
-                                     + " references " + teamTable.getTableName();
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                 , "Player"
-                                 , "id bigint not null"
-                                 + ", firstName varchar(255)"
-                                 + ", lastName varchar(255)"
-                                 + ", team_id bigint not null"
-                                 + ", primary key (id)"
-                                 )
-                .create()
-                .alter(playerTableConstraint)
-                .insertValues("1, 'Paul', 'Pogba', 1");
+    // GIVEN
+    TestTable sponsorTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Sponsor",
+                "  id bigint" + ",  name varchar(255) not null" + ", primary key (id)")
+            .create()
+            .insertValues("1, 'Sponsor name'");
 
-        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
+    String teamSponsorForeignKey =
+        "add constraint team_sponsor_fk"
+            + generateRandomPositiveInt()
+            + " foreign key (sponsor_id)"
+            + " references "
+            + sponsorTable.getTableName();
 
-        // WHEN
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(playerSelect);
+    TestTable teamTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Team",
+                " id bigint not null"
+                    + ", name varchar(255) not null"
+                    + ", sponsor_id bigint not null"
+                    + ", primary key (id)")
+            .create()
+            .alter(teamSponsorForeignKey)
+            .insertValues("1, 'Manchester United', 1");
 
-        // THEN
-        playerTable.drop();
-        teamTable.drop().create();
-        playerTable.create().alter(playerTableConstraint);
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript)
-                               .hasNumberOfRows(1);
-        assertThat(teamTable).hasNumberOfRows(1)
-                             .row(0).column(0).hasValues(1)
-                             .row(0).column(1).hasValues("Manchester United");
+    String playerTeamForeignKey =
+        "add constraint player_team_fk"
+            + generateRandomPositiveInt()
+            + " foreign key (team_id)"
+            + " references "
+            + teamTable.getTableName();
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "id bigint not null"
+                    + ", firstName varchar(255)"
+                    + ", lastName varchar(255)"
+                    + ", team_id bigint not null"
+                    + ", primary key (id)")
+            .create()
+            .alter(playerTeamForeignKey)
+            .insertValues("1, 'Paul', 'Pogba', 1");
 
-    }
+    String playerSelect = "SELECT * FROM " + playerTable.getTableName();
 
-    @Test public void
-    should_add_joined_rows_of_joined_rows_because_of_not_null_foreign_keys() {
+    // WHEN
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(playerSelect);
 
-        // GIVEN
-        TestTable sponsorTable =
-                buildUniqueTable(DATA_SOURCE
-                                          , "Sponsor"
-                                          , "  id bigint" +
-                                          ",  name varchar(255) not null" +
-                                          ", primary key (id)"
-                                          )
-                .create()
-                .insertValues("1, 'Sponsor name'");
-
-        String teamSponsorForeignKey = "add constraint team_sponsor_fk" + generateRandomPositiveInt()
-                                     + " foreign key (sponsor_id)"
-                                     + " references " + sponsorTable.getTableName();
-
-        TestTable teamTable =
-                buildUniqueTable(DATA_SOURCE
-                                 , "Team"
-                                 ," id bigint not null" +
-                                 ", name varchar(255) not null" +
-                                 ", sponsor_id bigint not null" +
-                                 ", primary key (id)"
-                                 )
-                .create()
-                .alter(teamSponsorForeignKey)
-                .insertValues("1, 'Manchester United', 1");
-
-        String playerTeamForeignKey =  "add constraint player_team_fk" + generateRandomPositiveInt()
-                                    + " foreign key (team_id)"
-                                    + " references " + teamTable.getTableName();
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Player"
-                                , "id bigint not null"
-                                + ", firstName varchar(255)"
-                                + ", lastName varchar(255)"
-                                + ", team_id bigint not null"
-                                + ", primary key (id)")
-                .create()
-                .alter(playerTeamForeignKey)
-                .insertValues("1, 'Paul', 'Pogba', 1");
-
-        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
-
-        // WHEN
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(playerSelect);
-
-        // THEN
-        playerTable.drop();
-        teamTable.drop();
-        sponsorTable.drop().create();
-        teamTable.create().alter(teamSponsorForeignKey);
-        playerTable.create().alter(playerTeamForeignKey);
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(playerTable).withScript(insertScript)
-                               .hasNumberOfRows(1);
-        assertThat(teamTable).withScript(insertScript)
-                             .hasNumberOfRows(1)
-                             .row(0).hasValues(1, "Manchester United", 1);
-        assertThat(sponsorTable).withScript(insertScript)
-                                .hasNumberOfRows(1);
-
-    }
-
+    // THEN
+    playerTable.drop();
+    teamTable.drop();
+    sponsorTable.drop().create();
+    teamTable.create().alter(teamSponsorForeignKey);
+    playerTable.create().alter(playerTeamForeignKey);
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(playerTable).withScript(insertScript).hasNumberOfRows(1);
+    assertThat(teamTable)
+        .withScript(insertScript)
+        .hasNumberOfRows(1)
+        .row(0)
+        .hasValues(1, "Manchester United", 1);
+    assertThat(sponsorTable).withScript(insertScript).hasNumberOfRows(1);
+  }
 }

@@ -12,55 +12,52 @@
  */
 package org.qstd.dbtype;
 
-import org.qstd.*;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import javax.sql.DataSource;
+import org.qstd.*;
 
 class BaseReferencedTablesFinder implements ReferencedTablesFinder {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    private final SqlQuery referencedTableQuery;
+  private final SqlQuery referencedTableQuery;
 
-    BaseReferencedTablesFinder(DataSource dataSource, SqlQuery referencedTableQuery) {
-        this.dataSource = dataSource;
-        this.referencedTableQuery =  referencedTableQuery;
+  BaseReferencedTablesFinder(DataSource dataSource, SqlQuery referencedTableQuery) {
+    this.dataSource = dataSource;
+    this.referencedTableQuery = referencedTableQuery;
+  }
+
+  @Override
+  public ReferencedTableSet findReferencedTablesOf(String tableName) {
+
+    Collection<ReferencedTable> referencedTables = new ArrayList<>();
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement referencedTablesStatement =
+            PreparedStatementBuilder.buildFrom(referencedTableQuery, connection)) {
+
+      referencedTablesStatement.setString(1, tableName);
+      ResultSet queryResult = referencedTablesStatement.executeQuery();
+
+      while (queryResult.next()) {
+        ReferencedTable referencedTable = buildReferencedTableFrom(queryResult);
+        referencedTables.add(referencedTable);
+      }
+
+    } catch (SQLException sqlException) {
+      sqlException.printStackTrace();
     }
+    return new ReferencedTableSet(referencedTables);
+  }
 
-    @Override
-    public ReferencedTableSet findReferencedTablesOf(String tableName) {
-
-        Collection<ReferencedTable> referencedTables = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement referencedTablesStatement = PreparedStatementBuilder.buildFrom(referencedTableQuery, connection)) {
-
-            referencedTablesStatement.setString(1, tableName);
-            ResultSet queryResult = referencedTablesStatement.executeQuery();
-
-            while(queryResult.next()) {
-                ReferencedTable referencedTable = buildReferencedTableFrom(queryResult);
-                referencedTables.add(referencedTable);
-            }
-
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-        return new ReferencedTableSet(referencedTables);
-    }
-
-    private ReferencedTable buildReferencedTableFrom(ResultSet queryResult) throws SQLException {
-        String resultTableName = queryResult.getString(1);
-        String referencedTableName = queryResult.getString(2);
-        int level = queryResult.getInt(3);
-        return new ReferencedTable(resultTableName
-                                 , referencedTableName
-                                 , level);
-    }
-
+  private ReferencedTable buildReferencedTableFrom(ResultSet queryResult) throws SQLException {
+    String resultTableName = queryResult.getString(1);
+    String referencedTableName = queryResult.getString(2);
+    int level = queryResult.getInt(3);
+    return new ReferencedTable(resultTableName, referencedTableName, level);
+  }
 }

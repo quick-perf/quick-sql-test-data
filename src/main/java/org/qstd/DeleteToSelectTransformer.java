@@ -12,42 +12,37 @@
  */
 package org.qstd;
 
+import java.util.Optional;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.delete.Delete;
 
-import java.util.Optional;
-
 class DeleteToSelectTransformer implements SelectTransformer {
 
-    private Delete deleteStatement;
+  private Delete deleteStatement;
 
-    DeleteToSelectTransformer(Delete delete) {
-        deleteStatement = delete;
-    }
+  DeleteToSelectTransformer(Delete delete) {
+    deleteStatement = delete;
+  }
 
-    @Override
-    public Optional<SqlQuery> toSelect(SqlQuery sqlQuery) {
-        String deleteAsString = sqlQuery.getQueryAsString();
-        String deleteString = toSelect(deleteAsString);
-        SqlQuery deleteQuery = new SqlQuery(deleteString);
-        return Optional.of(deleteQuery);
-    }
+  @Override
+  public Optional<SqlQuery> toSelect(SqlQuery sqlQuery) {
+    String deleteAsString = sqlQuery.getQueryAsString();
+    String deleteString = toSelect(deleteAsString);
+    SqlQuery deleteQuery = new SqlQuery(deleteString);
+    return Optional.of(deleteQuery);
+  }
 
-    private String toSelect(String sqlQueryAsString) {
-        String tableName = deleteStatement.getTable().getName();
+  private String toSelect(String sqlQueryAsString) {
+    String tableName = deleteStatement.getTable().getName();
 
-        String whereClauseAsString = findWhereClauseAsString();
+    String whereClauseAsString = findWhereClauseAsString();
 
-        return    " SELECT " + "*"
-                + " FROM " + tableName
-                + whereClauseAsString;
-    }
+    return " SELECT " + "*" + " FROM " + tableName + whereClauseAsString;
+  }
 
-    private String findWhereClauseAsString() {
-        Expression whereExpression = deleteStatement.getWhere();
-        String whereClauseAsString = whereExpression == null ? ""
-                                     :" WHERE " + whereExpression;
-        return whereClauseAsString;
-    }
-
+  private String findWhereClauseAsString() {
+    Expression whereExpression = deleteStatement.getWhere();
+    String whereClauseAsString = whereExpression == null ? "" : " WHERE " + whereExpression;
+    return whereClauseAsString;
+  }
 }

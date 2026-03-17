@@ -12,11 +12,6 @@
  */
 package org.qstd.dbtype;
 
-import org.qstd.NotNullColumnsFinder;
-import org.qstd.PreparedStatementBuilder;
-import org.qstd.SqlQuery;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,38 +20,42 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import javax.sql.DataSource;
+import org.qstd.NotNullColumnsFinder;
+import org.qstd.PreparedStatementBuilder;
+import org.qstd.SqlQuery;
 
 public class BaseNotNullColumnsFinder implements NotNullColumnsFinder {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    private final SqlQuery notNullColumnsQuery;
+  private final SqlQuery notNullColumnsQuery;
 
-    BaseNotNullColumnsFinder(DataSource dataSource, SqlQuery notNullColumnsQuery) {
-        this.dataSource = dataSource;
-        this.notNullColumnsQuery = notNullColumnsQuery;
+  BaseNotNullColumnsFinder(DataSource dataSource, SqlQuery notNullColumnsQuery) {
+    this.dataSource = dataSource;
+    this.notNullColumnsQuery = notNullColumnsQuery;
+  }
+
+  @Override
+  public Collection<String> findNotNullColumnsOf(String tableName) {
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement columnOrderStatement =
+            PreparedStatementBuilder.buildFrom(notNullColumnsQuery, connection)) {
+      columnOrderStatement.setString(1, tableName);
+      ResultSet queryResult = columnOrderStatement.executeQuery();
+      return findNotNullColumnsFrom(queryResult);
+    } catch (SQLException sqlException) {
+      sqlException.printStackTrace();
     }
+    return Collections.emptyList();
+  }
 
-    @Override
-    public Collection<String> findNotNullColumnsOf(String tableName) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement columnOrderStatement = PreparedStatementBuilder.buildFrom(notNullColumnsQuery, connection)) {
-            columnOrderStatement.setString(1, tableName);
-            ResultSet queryResult = columnOrderStatement.executeQuery();
-            return findNotNullColumnsFrom(queryResult);
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-        return Collections.emptyList();
+  private List<String> findNotNullColumnsFrom(ResultSet resultSet) throws SQLException {
+    List<String> notNullColumns = new ArrayList<>();
+    while (resultSet.next()) {
+      String columnName = resultSet.getString(3);
+      notNullColumns.add(columnName);
     }
-
-    private List<String> findNotNullColumnsFrom(ResultSet resultSet) throws SQLException {
-        List<String> notNullColumns = new ArrayList<>();
-        while (resultSet.next()) {
-            String columnName = resultSet.getString(3);
-            notNullColumns.add(columnName);
-        }
-        return notNullColumns;
-    }
-
+    return notNullColumns;
+  }
 }

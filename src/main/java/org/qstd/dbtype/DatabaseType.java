@@ -14,49 +14,44 @@ package org.qstd.dbtype;
 
 import static java.util.Arrays.stream;
 
-/**
- * Database type
- */
+/** Database type */
 public enum DatabaseType {
 
-    /**H2*/
-    H2("jdbc:h2")
-    ,/**HSQLDB*/
-    HSQLDB("jdbc:hsqldb")
-    ,/**MariaDB*/
-    MARIA_DB("jdbc:mariadb")
-    ,/**Microsoft SQL Server*/
-    MICROSOFT_SQL_SERVER("jdbc:sqlserver")
-    ,/**MySQL*/
-    MY_SQL("jdbc:mysql")
-    ,/**Oracle*/
-    ORACLE("jdbc:oracle")
-    ,/**PostgreSQL*/
-    POSTGRE_SQL("jdbc:postgresql")
-    ,/**Other database type*/
-    OTHER("jdbc:");
+  /** H2 */
+  H2("jdbc:h2"),
+  /** HSQLDB */
+  HSQLDB("jdbc:hsqldb"),
+  /** MariaDB */
+  MARIA_DB("jdbc:mariadb"),
+  /** Microsoft SQL Server */
+  MICROSOFT_SQL_SERVER("jdbc:sqlserver"),
+  /** MySQL */
+  MY_SQL("jdbc:mysql"),
+  /** Oracle */
+  ORACLE("jdbc:oracle"),
+  /** PostgreSQL */
+  POSTGRE_SQL("jdbc:postgresql"),
+  /** Other database type */
+  OTHER("jdbc:");
 
-    private final String jdbcUrlStart;
+  private final String jdbcUrlStart;
 
-    DatabaseType(String jdbcUrlStart) {
-        this.jdbcUrlStart = jdbcUrlStart;
-    }
+  DatabaseType(String jdbcUrlStart) {
+    this.jdbcUrlStart = jdbcUrlStart;
+  }
 
-    /**
-     * Find the database type from the JDBC URL
-     * @param jdbcUrl A JDBC URL
-     * @return The database type
-     */
-    public static DatabaseType findFromDbUrl(String jdbcUrl) {
-        DatabaseType[] databaseTypes = DatabaseType.values();
-        return   stream(databaseTypes)
-                .filter(dbType -> dbType.accept(jdbcUrl))
-                .findFirst()
-                .get();
-    }
+  /**
+   * Find the database type from the JDBC URL
+   *
+   * @param jdbcUrl A JDBC URL
+   * @return The database type
+   */
+  public static DatabaseType findFromDbUrl(String jdbcUrl) {
+    DatabaseType[] databaseTypes = DatabaseType.values();
+    return stream(databaseTypes).filter(dbType -> dbType.accept(jdbcUrl)).findFirst().get();
+  }
 
-    private boolean accept(String jdbcUrl) {
-        return jdbcUrl.startsWith(jdbcUrlStart);
-    }
-
+  private boolean accept(String jdbcUrl) {
+    return jdbcUrl.startsWith(jdbcUrlStart);
+  }
 }

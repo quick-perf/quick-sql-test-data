@@ -12,69 +12,71 @@
  */
 package org.qstd.dbtype;
 
-import org.qstd.*;
-
-import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.List;
+import javax.sql.DataSource;
+import org.qstd.*;
 
 class PostgreSqlMetadataFinder implements DatabaseMetadataFinder {
 
-    private static final SqlQuery POSTGRE_SQL_COLUMNS_MAPPINGS_QUERY = new SqlQuery("select\n" +
-            "       tc.table_schema     as table_schema,\n" +
-            "       tc.table_name       as table_name,\n" +
-            "       kcu.column_name     as column_name,\n" +
-            "       ccu.table_schema    as ref_table_schema,\n" +
-            "       ccu.table_name      as ref_table_name,\n" +
-            "       ccu.column_name     as ref_column_name\n" +
-            "  from information_schema.table_constraints as tc\n" +
-            "  join information_schema.key_column_usage as kcu\n" +
-            "       using (constraint_schema, constraint_name, table_schema)\n" +
-            "  join information_schema.constraint_column_usage as ccu\n" +
-            "       using (constraint_schema, constraint_name, table_schema)\n" +
-            "where tc.constraint_type = 'FOREIGN KEY' and tc.table_name=?");
+  private static final SqlQuery POSTGRE_SQL_COLUMNS_MAPPINGS_QUERY =
+      new SqlQuery(
+          "select\n"
+              + "       tc.table_schema     as table_schema,\n"
+              + "       tc.table_name       as table_name,\n"
+              + "       kcu.column_name     as column_name,\n"
+              + "       ccu.table_schema    as ref_table_schema,\n"
+              + "       ccu.table_name      as ref_table_name,\n"
+              + "       ccu.column_name     as ref_column_name\n"
+              + "  from information_schema.table_constraints as tc\n"
+              + "  join information_schema.key_column_usage as kcu\n"
+              + "       using (constraint_schema, constraint_name, table_schema)\n"
+              + "  join information_schema.constraint_column_usage as ccu\n"
+              + "       using (constraint_schema, constraint_name, table_schema)\n"
+              + "where tc.constraint_type = 'FOREIGN KEY' and tc.table_name=?");
 
-    private final DefaultColumnOrdersFinder defaultColumnOrdersFinder;
+  private final DefaultColumnOrdersFinder defaultColumnOrdersFinder;
 
-    private final NotNullColumnsFinder defaultNotNullColumnsFinder;
+  private final NotNullColumnsFinder defaultNotNullColumnsFinder;
 
-    private final PostgreSqlMariaDbReferencedTablesFinder postgreSqlMariaDbReferencedTablesFinder;
+  private final PostgreSqlMariaDbReferencedTablesFinder postgreSqlMariaDbReferencedTablesFinder;
 
-    private final ColumnsMappingsFinder postgreSqlColumnsMappingsFinder;
+  private final ColumnsMappingsFinder postgreSqlColumnsMappingsFinder;
 
-    private final PrimaryKeyColumnsFinder primaryKeyColumnsFinder;
+  private final PrimaryKeyColumnsFinder primaryKeyColumnsFinder;
 
-    PostgreSqlMetadataFinder(DataSource dataSource) {
-        this.defaultColumnOrdersFinder = new DefaultColumnOrdersFinder(dataSource);
-        this.defaultNotNullColumnsFinder = new DefaultNotNullColumnsFinder(dataSource);
-        this.postgreSqlMariaDbReferencedTablesFinder = new PostgreSqlMariaDbReferencedTablesFinder(dataSource);
-        this.postgreSqlColumnsMappingsFinder = new BaseColumnsMappingsFinder(dataSource, POSTGRE_SQL_COLUMNS_MAPPINGS_QUERY);
-        this.primaryKeyColumnsFinder = new DefaultPrimaryKeyColumnsFinder(dataSource);
-    }
+  PostgreSqlMetadataFinder(DataSource dataSource) {
+    this.defaultColumnOrdersFinder = new DefaultColumnOrdersFinder(dataSource);
+    this.defaultNotNullColumnsFinder = new DefaultNotNullColumnsFinder(dataSource);
+    this.postgreSqlMariaDbReferencedTablesFinder =
+        new PostgreSqlMariaDbReferencedTablesFinder(dataSource);
+    this.postgreSqlColumnsMappingsFinder =
+        new BaseColumnsMappingsFinder(dataSource, POSTGRE_SQL_COLUMNS_MAPPINGS_QUERY);
+    this.primaryKeyColumnsFinder = new DefaultPrimaryKeyColumnsFinder(dataSource);
+  }
 
-    @Override
-    public List<String> findDatabaseColumnOrdersOf(String tableName) {
-        return defaultColumnOrdersFinder.findDatabaseColumnOrdersOf(tableName);
-    }
+  @Override
+  public List<String> findDatabaseColumnOrdersOf(String tableName) {
+    return defaultColumnOrdersFinder.findDatabaseColumnOrdersOf(tableName);
+  }
 
-    @Override
-    public Collection<String> findNotNullColumnsOf(String tableName) {
-        return defaultNotNullColumnsFinder.findNotNullColumnsOf(tableName);
-    }
+  @Override
+  public Collection<String> findNotNullColumnsOf(String tableName) {
+    return defaultNotNullColumnsFinder.findNotNullColumnsOf(tableName);
+  }
 
-    @Override
-    public ReferencedTableSet findReferencedTablesOf(String tableName) {
-        return postgreSqlMariaDbReferencedTablesFinder.findReferencedTablesOf(tableName);
-    }
+  @Override
+  public ReferencedTableSet findReferencedTablesOf(String tableName) {
+    return postgreSqlMariaDbReferencedTablesFinder.findReferencedTablesOf(tableName);
+  }
 
-    @Override
-    public ColumnsMappingGroup findColumnsMappingsOf(String tableName) {
-        return postgreSqlColumnsMappingsFinder.findColumnsMappingsOf(tableName);
-    }
+  @Override
+  public ColumnsMappingGroup findColumnsMappingsOf(String tableName) {
+    return postgreSqlColumnsMappingsFinder.findColumnsMappingsOf(tableName);
+  }
 
-    @Override
-    public List<String> findPrimaryColumnsOf(String tableName) {
-        return primaryKeyColumnsFinder.findPrimaryColumnsOf(tableName);
-    }
-
+  @Override
+  public List<String> findPrimaryColumnsOf(String tableName) {
+    return primaryKeyColumnsFinder.findPrimaryColumnsOf(tableName);
+  }
 }

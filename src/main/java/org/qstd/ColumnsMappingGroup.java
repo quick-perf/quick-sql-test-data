@@ -19,20 +19,19 @@ import java.util.Optional;
 
 public class ColumnsMappingGroup {
 
-    public static final ColumnsMappingGroup NO_MAPPING = new ColumnsMappingGroup(Collections.emptyList());
+  public static final ColumnsMappingGroup NO_MAPPING =
+      new ColumnsMappingGroup(Collections.emptyList());
 
-    private final Collection<ColumnsMapping> columnsMappings;
+  private final Collection<ColumnsMapping> columnsMappings;
 
-    public ColumnsMappingGroup(Collection<ColumnsMapping> columnsMappings) {
-        this.columnsMappings = new ArrayList<>(columnsMappings);
-    }
+  public ColumnsMappingGroup(Collection<ColumnsMapping> columnsMappings) {
+    this.columnsMappings = new ArrayList<>(columnsMappings);
+  }
 
-    Optional<ColumnMappingPart> findMappingForColumn(String columnName) {
-        return   columnsMappings
-                .stream()
-                .filter(columnsMapping -> columnsMapping.hasMappingForColumn(columnName))
-                .map(ColumnsMapping::getMapping)
-                .findFirst();
-    }
-
+  Optional<ColumnMappingPart> findMappingForColumn(String columnName) {
+    return columnsMappings.stream()
+        .filter(columnsMapping -> columnsMapping.hasMappingForColumn(columnName))
+        .map(ColumnsMapping::getMapping)
+        .findFirst();
+  }
 }

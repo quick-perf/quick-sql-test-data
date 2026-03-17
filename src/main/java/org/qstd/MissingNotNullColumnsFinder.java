@@ -12,48 +12,47 @@
  */
 package org.qstd;
 
-import org.qstd.dbtype.DatabaseType;
+import static java.util.stream.Collectors.toList;
 
-import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-
-import static java.util.stream.Collectors.toList;
+import javax.sql.DataSource;
+import org.qstd.dbtype.DatabaseType;
 
 class MissingNotNullColumnsFinder {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    private final DatabaseType dbType;
+  private final DatabaseType dbType;
 
-    private final DatabaseMetadataFinder databaseMetadataFinder;
+  private final DatabaseMetadataFinder databaseMetadataFinder;
 
-    MissingNotNullColumnsFinder(DataSource dataSource, DatabaseType dbType, DatabaseMetadataFinder databaseMetadataFinder) {
-        this.dataSource = dataSource;
-        this.dbType = dbType;
-        this.databaseMetadataFinder = databaseMetadataFinder;
+  MissingNotNullColumnsFinder(
+      DataSource dataSource, DatabaseType dbType, DatabaseMetadataFinder databaseMetadataFinder) {
+    this.dataSource = dataSource;
+    this.dbType = dbType;
+    this.databaseMetadataFinder = databaseMetadataFinder;
+  }
+
+  Map<String, Object> findMissingNoNullColumnsOf(DatasetRow datasetRow) {
+
+    String tableName = datasetRow.getTableName();
+
+    Collection<String> notNullColumns = databaseMetadataFinder.findNotNullColumnsOf(tableName);
+
+    Collection<String> missingNotNullColumns =
+        notNullColumns.stream()
+            .filter(columnName -> !datasetRow.hasNotNullValueForColumn(columnName))
+            .collect(toList());
+
+    if (!missingNotNullColumns.isEmpty()) {
+      RowFinder rowFinder = new RowFinder(dataSource, dbType);
+      DatasetRow datasetRowWithMissingNotNullColumns =
+          rowFinder.findOneRowFrom(datasetRow.getTableName(), missingNotNullColumns, datasetRow);
+      return datasetRowWithMissingNotNullColumns.getColumnValueByColumnName();
     }
 
-    Map<String, Object> findMissingNoNullColumnsOf(DatasetRow datasetRow) {
-
-        String tableName = datasetRow.getTableName();
-
-        Collection<String> notNullColumns = databaseMetadataFinder.findNotNullColumnsOf(tableName);
-
-        Collection<String> missingNotNullColumns =  notNullColumns
-                                                   .stream()
-                                                   .filter(columnName -> !datasetRow.hasNotNullValueForColumn(columnName))
-                                                   .collect(toList());
-
-        if (!missingNotNullColumns.isEmpty()) {
-            RowFinder rowFinder = new RowFinder(dataSource, dbType);
-            DatasetRow datasetRowWithMissingNotNullColumns = rowFinder.findOneRowFrom(datasetRow.getTableName(), missingNotNullColumns, datasetRow);
-            return datasetRowWithMissingNotNullColumns.getColumnValueByColumnName();
-        }
-
-        return Collections.emptyMap();
-
-    }
-
+    return Collections.emptyMap();
+  }
 }

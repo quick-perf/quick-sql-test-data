@@ -12,104 +12,104 @@
  */
 package org.qstd;
 
+import static java.util.Collections.emptyList;
+import static org.qstd.SelectTransformerFactory.createSelectTransformer;
+
+import java.sql.*;
+import java.util.*;
+import javax.sql.DataSource;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.TablesNamesFinder;
 
-import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
-
-import static java.util.Collections.emptyList;
-import static org.qstd.SelectTransformerFactory.createSelectTransformer;
-
 class DatasetRowsFinder {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    DatasetRowsFinder(DataSource dataSource) {
-        this.dataSource = dataSource;
+  DatasetRowsFinder(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  Collection<DatasetRow> findDatasetRowsOf(SqlQuery sqlQuery) {
+
+    SelectTransformer selectTransformer = createSelectTransformer(sqlQuery);
+    Optional<SqlQuery> optionalSelectQuery = selectTransformer.toSelect(sqlQuery);
+
+    if (optionalSelectQuery.isPresent()) {
+      SqlQuery selectQuery = optionalSelectQuery.get();
+      return execute(selectQuery);
     }
 
-    Collection<DatasetRow> findDatasetRowsOf(SqlQuery sqlQuery) {
+    return emptyList();
+  }
 
-        SelectTransformer selectTransformer = createSelectTransformer(sqlQuery);
-        Optional<SqlQuery> optionalSelectQuery = selectTransformer.toSelect(sqlQuery);
+  private Collection<DatasetRow> execute(SqlQuery sqlQuery) {
 
-        if (optionalSelectQuery.isPresent()) {
-            SqlQuery selectQuery = optionalSelectQuery.get();
-            return execute(selectQuery);
-        }
+    List<DatasetRow> datasetRowsToReturn = new ArrayList<>();
 
-        return emptyList();
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement selectStatement =
+            PreparedStatementBuilder.buildFrom(sqlQuery, connection)) {
+
+      ResultSet resultSet = selectStatement.executeQuery();
+
+      ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+      int columnCount = resultSetMetaData.getColumnCount();
+
+      while (resultSet.next()) {
+        Collection<DatasetRow> datasetRows =
+            buildDatasetRowsFrom(
+                resultSet, resultSetMetaData,
+                columnCount, sqlQuery);
+        datasetRowsToReturn.addAll(datasetRows);
+      }
+    } catch (SQLException sqlException) {
+      sqlException.printStackTrace();
     }
 
-    private Collection<DatasetRow> execute(SqlQuery sqlQuery) {
+    return datasetRowsToReturn;
+  }
 
-        List<DatasetRow> datasetRowsToReturn = new ArrayList<>();
+  private Collection<DatasetRow> buildDatasetRowsFrom(
+      ResultSet resultSet, ResultSetMetaData resultSetMetaData, int columnCount, SqlQuery sqlQuery)
+      throws SQLException {
+    Map<String, DatasetRow> rowsByTableName = new HashMap<>();
+    for (int colIndex = 1; colIndex <= columnCount; colIndex++) {
+      final String tableName = findTableName(resultSetMetaData, colIndex, sqlQuery);
+      DatasetRow datasetRow =
+          rowsByTableName.computeIfAbsent(tableName, t -> DatasetRow.ofTable(tableName));
 
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement selectStatement = PreparedStatementBuilder.buildFrom(sqlQuery, connection)) {
-
-            ResultSet resultSet = selectStatement.executeQuery();
-
-            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            int columnCount = resultSetMetaData.getColumnCount();
-
-            while (resultSet.next()) {
-                Collection<DatasetRow> datasetRows =
-                        buildDatasetRowsFrom(resultSet, resultSetMetaData
-                                           , columnCount, sqlQuery);
-                datasetRowsToReturn.addAll(datasetRows);
-            }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-
-        return datasetRowsToReturn;
-
+      String column = resultSetMetaData.getColumnName(colIndex);
+      Object value = resultSet.getObject(colIndex);
+      datasetRow.addColumnValue(column, value);
     }
+    return rowsByTableName.values();
+  }
 
-    private Collection<DatasetRow> buildDatasetRowsFrom(ResultSet resultSet, ResultSetMetaData resultSetMetaData
-                                                      , int columnCount, SqlQuery sqlQuery) throws SQLException {
-        Map<String, DatasetRow> rowsByTableName = new HashMap<>();
-        for (int colIndex = 1; colIndex <= columnCount; colIndex++) {
-            final String tableName = findTableName(resultSetMetaData, colIndex, sqlQuery);
-            DatasetRow datasetRow =
-                    rowsByTableName.computeIfAbsent(tableName
-                                                  , t -> DatasetRow.ofTable(tableName));
-
-            String column = resultSetMetaData.getColumnName(colIndex);
-            Object value = resultSet.getObject(colIndex);
-            datasetRow.addColumnValue(column, value);
-        }
-        return rowsByTableName.values();
+  private String findTableName(ResultSetMetaData resultSetMetaData, int colIndex, SqlQuery sqlQuery)
+      throws SQLException {
+    String tableName = resultSetMetaData.getTableName(colIndex);
+    if (!tableName.isEmpty()) {
+      return tableName;
     }
+    String queryAsString = sqlQuery.getQueryAsString();
+    return extractTableNameFrom(queryAsString);
+  }
 
-    private String findTableName(ResultSetMetaData resultSetMetaData, int colIndex, SqlQuery sqlQuery) throws SQLException {
-        String tableName = resultSetMetaData.getTableName(colIndex);
-        if (!tableName.isEmpty()) {
-            return tableName;
-        }
-        String queryAsString = sqlQuery.getQueryAsString();
-        return extractTableNameFrom(queryAsString);
+  private String extractTableNameFrom(String sqlQueryAsString) {
+    try {
+      Statement statement = CCJSqlParserUtil.parse(sqlQueryAsString);
+      Select select = (Select) statement;
+      TablesNamesFinder tablesNamesFinder = new TablesNamesFinder();
+      List<String> tableList = tablesNamesFinder.getTableList(select);
+      if (tableList.size() == 1) {
+        return tableList.get(0);
+      }
+    } catch (JSQLParserException e) {
+      e.printStackTrace();
     }
-
-    private String extractTableNameFrom(String sqlQueryAsString) {
-        try {
-            Statement statement = CCJSqlParserUtil.parse(sqlQueryAsString);
-            Select select = (Select) statement;
-            TablesNamesFinder tablesNamesFinder = new TablesNamesFinder();
-            List<String> tableList = tablesNamesFinder.getTableList(select);
-            if(tableList.size() == 1) {
-                return tableList.get(0);
-            }
-        } catch (JSQLParserException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
+    return "";
+  }
 }

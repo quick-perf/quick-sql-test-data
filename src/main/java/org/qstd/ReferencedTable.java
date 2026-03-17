@@ -14,20 +14,19 @@ package org.qstd;
 
 public class ReferencedTable {
 
-    private final String tableName;
+  private final String tableName;
 
-    private final String referencedTableName;
+  private final String referencedTableName;
 
-    private final int level;
+  private final int level;
 
-    public ReferencedTable(String tableName, String referencedTableName, int level) {
-        this.tableName = tableName;
-        this.referencedTableName = referencedTableName;
-        this.level = level;
-    }
+  public ReferencedTable(String tableName, String referencedTableName, int level) {
+    this.tableName = tableName;
+    this.referencedTableName = referencedTableName;
+    this.level = level;
+  }
 
-    boolean references(String tableName) {
-        return tableName.equals(referencedTableName);
-    }
-
+  boolean references(String tableName) {
+    return tableName.equals(referencedTableName);
+  }
 }

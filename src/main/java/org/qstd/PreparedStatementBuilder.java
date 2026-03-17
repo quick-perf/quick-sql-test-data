@@ -19,17 +19,16 @@ import java.util.List;
 
 public class PreparedStatementBuilder {
 
-    private PreparedStatementBuilder() {
-    }
+  private PreparedStatementBuilder() {}
 
-    public static PreparedStatement buildFrom(SqlQuery sqlQuery, Connection connection) throws SQLException {
-        String queryAsString = sqlQuery.getQueryAsString();
-        PreparedStatement preparedStatement = connection.prepareStatement(queryAsString);
-        List<Object> parameters = sqlQuery.getParameters();
-        for (int i = 0; i < parameters.size(); i++) {
-            preparedStatement.setObject(i + 1, parameters.get(i));
-        }
-        return preparedStatement;
+  public static PreparedStatement buildFrom(SqlQuery sqlQuery, Connection connection)
+      throws SQLException {
+    String queryAsString = sqlQuery.getQueryAsString();
+    PreparedStatement preparedStatement = connection.prepareStatement(queryAsString);
+    List<Object> parameters = sqlQuery.getParameters();
+    for (int i = 0; i < parameters.size(); i++) {
+      preparedStatement.setObject(i + 1, parameters.get(i));
     }
-
+    return preparedStatement;
+  }
 }

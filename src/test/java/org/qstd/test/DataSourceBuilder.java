@@ -14,21 +14,19 @@ package org.qstd.test;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
 import javax.sql.DataSource;
 
 class DataSourceBuilder {
 
-    static final DataSourceBuilder INSTANCE = new DataSourceBuilder();
+  static final DataSourceBuilder INSTANCE = new DataSourceBuilder();
 
-    private DataSourceBuilder() { }
+  private DataSourceBuilder() {}
 
-    static DataSource build(String jdbcUrl, String dbUserName, String dbPassword) {
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(jdbcUrl);
-        hikariConfig.setUsername(dbUserName);
-        hikariConfig.setPassword(dbPassword);
-        return new HikariDataSource(hikariConfig);
-    }
-
+  static DataSource build(String jdbcUrl, String dbUserName, String dbPassword) {
+    HikariConfig hikariConfig = new HikariConfig();
+    hikariConfig.setJdbcUrl(jdbcUrl);
+    hikariConfig.setUsername(dbUserName);
+    hikariConfig.setPassword(dbPassword);
+    return new HikariDataSource(hikariConfig);
+  }
 }

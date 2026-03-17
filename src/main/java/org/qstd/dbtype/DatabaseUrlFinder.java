@@ -12,30 +12,28 @@
  */
 package org.qstd.dbtype;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 
-/**
- * Class helping to find database URL
- */
+/** Class helping to find database URL */
 public class DatabaseUrlFinder {
 
-    public static final DatabaseUrlFinder INSTANCE = new DatabaseUrlFinder();
+  public static final DatabaseUrlFinder INSTANCE = new DatabaseUrlFinder();
 
-    /**
-     * Find the database URL from a data source
-     * @param dataSource A data source
-     * @return The database URL
-     */
-    public static String findDbUrlFrom(DataSource dataSource) {
-        try (Connection connection = dataSource.getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
-            return metaData.getURL().toLowerCase();
-        } catch (SQLException sqlException) {
-            throw new IllegalStateException(sqlException);
-        }
+  /**
+   * Find the database URL from a data source
+   *
+   * @param dataSource A data source
+   * @return The database URL
+   */
+  public static String findDbUrlFrom(DataSource dataSource) {
+    try (Connection connection = dataSource.getConnection()) {
+      DatabaseMetaData metaData = connection.getMetaData();
+      return metaData.getURL().toLowerCase();
+    } catch (SQLException sqlException) {
+      throw new IllegalStateException(sqlException);
     }
-
+  }
 }

@@ -298,6 +298,38 @@
 
     <profiles>
         <profile>
+            <id>spotless</id>
+            <activation>
+                <!-- google-java-format 1.25.2 requires JVM 17+ to run
+                     but formats Java 8 source code correctly -->
+                <jdk>17</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.diffplug.spotless</groupId>
+                        <artifactId>spotless-maven-plugin</artifactId>
+                        <version>2.44.3</version>
+                        <configuration>
+                            <java>
+                                <googleJavaFormat>
+                                    <version>1.25.2</version>
+                                </googleJavaFormat>
+                            </java>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>release</id>
             <build>
                 <plugins>
