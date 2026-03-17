@@ -12,6 +12,7 @@
  */
 package org.qstd;
 
+import java.util.Optional;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -19,49 +20,44 @@ import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.update.Update;
 
-import java.util.Optional;
-
 class SelectTransformerFactory {
 
-    private SelectTransformerFactory() {
+  private SelectTransformerFactory() {}
+
+  private static final SelectTransformer SELECT_TO_SELECT_TRANSFORMER =
+      new SelectTransformer() {
+        @Override
+        public Optional<SqlQuery> toSelect(SqlQuery sqlQuery) {
+          return Optional.of(sqlQuery);
+        }
+      };
+
+  static SelectTransformer createSelectTransformer(SqlQuery sqlQuery) {
+
+    String sqlQueryAsString = sqlQuery.getQueryAsString();
+    Statement statement = parse(sqlQueryAsString);
+
+    if (statement instanceof Select) {
+      return SELECT_TO_SELECT_TRANSFORMER;
+    }
+    if (statement instanceof Update) {
+      Update update = (Update) statement;
+      return new UpdateToSelectTransformer(update);
+    }
+    if (statement instanceof Delete) {
+      Delete delete = (Delete) statement;
+      return new DeleteToSelectTransformer(delete);
     }
 
-    private static final SelectTransformer SELECT_TO_SELECT_TRANSFORMER =
+    return SelectTransformer.NO_SELECT_TRANSFORMER;
+  }
 
-            new SelectTransformer() {
-                @Override
-                public Optional<SqlQuery> toSelect(SqlQuery sqlQuery) {
-                    return Optional.of(sqlQuery);
-                }
-            };
-
-    static SelectTransformer createSelectTransformer(SqlQuery sqlQuery) {
-
-        String sqlQueryAsString = sqlQuery.getQueryAsString();
-        Statement statement = parse(sqlQueryAsString);
-
-        if(statement instanceof Select) {
-            return SELECT_TO_SELECT_TRANSFORMER;
-        }
-        if(statement instanceof Update) {
-            Update update = (Update) statement;
-            return new UpdateToSelectTransformer(update);
-        }
-        if(statement instanceof Delete) {
-            Delete delete = (Delete) statement;
-            return new DeleteToSelectTransformer(delete);
-        }
-
-        return SelectTransformer.NO_SELECT_TRANSFORMER;
+  private static Statement parse(String sqlQuery) {
+    try {
+      return CCJSqlParserUtil.parse(sqlQuery);
+    } catch (JSQLParserException e) {
+      e.printStackTrace();
+      return null;
     }
-
-    private static Statement parse(String sqlQuery) {
-        try {
-            return CCJSqlParserUtil.parse(sqlQuery);
-        } catch (JSQLParserException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
+  }
 }

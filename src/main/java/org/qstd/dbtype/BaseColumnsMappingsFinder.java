@@ -12,69 +12,65 @@
  */
 package org.qstd.dbtype;
 
-import org.qstd.*;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import javax.sql.DataSource;
+import org.qstd.*;
 
 class BaseColumnsMappingsFinder implements ColumnsMappingsFinder {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    private final SqlQuery columnsMappingQuery;
+  private final SqlQuery columnsMappingQuery;
 
-    public BaseColumnsMappingsFinder(DataSource dataSource, SqlQuery columnsMappingQuery) {
-        this.dataSource = dataSource;
-        this.columnsMappingQuery = columnsMappingQuery;
+  public BaseColumnsMappingsFinder(DataSource dataSource, SqlQuery columnsMappingQuery) {
+    this.dataSource = dataSource;
+    this.columnsMappingQuery = columnsMappingQuery;
+  }
+
+  @Override
+  public ColumnsMappingGroup findColumnsMappingsOf(String tableName) {
+
+    Collection<ColumnsMapping> columnsMappings = new ArrayList<>();
+
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement referencedTablesStatement =
+            PreparedStatementBuilder.buildFrom(columnsMappingQuery, connection)) {
+      referencedTablesStatement.setString(1, tableName);
+
+      ResultSet queryResult = referencedTablesStatement.executeQuery();
+
+      while (queryResult.next()) {
+        ColumnsMapping columnsMapping = buildColumnsMappingFrom(queryResult);
+        columnsMappings.add(columnsMapping);
+      }
+
+    } catch (SQLException sqlException) {
+      sqlException.printStackTrace();
     }
 
-    @Override
-    public ColumnsMappingGroup findColumnsMappingsOf(String tableName) {
+    return new ColumnsMappingGroup(columnsMappings);
+  }
 
-        Collection<ColumnsMapping> columnsMappings = new ArrayList<>();
+  private ColumnsMapping buildColumnsMappingFrom(ResultSet queryResult) throws SQLException {
+    String firstTableSchema = queryResult.getString(1);
+    String firstTableName = queryResult.getString(2);
+    String firstTableColumn = queryResult.getString(3);
 
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement referencedTablesStatement = PreparedStatementBuilder.buildFrom(columnsMappingQuery, connection)) {
-            referencedTablesStatement.setString(1, tableName);
+    ColumnMappingPart columnMappingPart1 =
+        new ColumnMappingPart(firstTableSchema, firstTableName, firstTableColumn);
 
-            ResultSet queryResult = referencedTablesStatement.executeQuery();
+    String secondTableSchema = queryResult.getString(4);
+    String secondTableName = queryResult.getString(5);
+    String secondTableColumn = queryResult.getString(6);
 
-            while (queryResult.next()) {
-                ColumnsMapping columnsMapping = buildColumnsMappingFrom(queryResult);
-                columnsMappings.add(columnsMapping);
-            }
+    ColumnMappingPart columnMappingPart2 =
+        new ColumnMappingPart(secondTableSchema, secondTableName, secondTableColumn);
 
-
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-
-
-        return new ColumnsMappingGroup(columnsMappings);
-
-    }
-
-    private ColumnsMapping buildColumnsMappingFrom(ResultSet queryResult) throws SQLException {
-        String firstTableSchema = queryResult.getString(1);
-        String firstTableName = queryResult.getString(2);
-        String firstTableColumn = queryResult.getString(3);
-
-        ColumnMappingPart columnMappingPart1
-                = new ColumnMappingPart(firstTableSchema, firstTableName, firstTableColumn);
-
-        String secondTableSchema = queryResult.getString(4);
-        String secondTableName = queryResult.getString(5);
-        String secondTableColumn = queryResult.getString(6);
-
-        ColumnMappingPart columnMappingPart2
-                = new ColumnMappingPart(secondTableSchema, secondTableName, secondTableColumn);
-
-        return new ColumnsMapping(columnMappingPart1, columnMappingPart2);
-    }
-
+    return new ColumnsMapping(columnMappingPart1, columnMappingPart2);
+  }
 }

@@ -12,32 +12,31 @@
  */
 package org.qstd.dbtype;
 
+import java.util.List;
+import javax.sql.DataSource;
 import org.qstd.ColumnOrdersFinder;
 import org.qstd.SqlQuery;
 
-import javax.sql.DataSource;
-import java.util.List;
-
 class DefaultColumnOrdersFinder implements ColumnOrdersFinder {
 
-    private static final SqlQuery COLUMN_ORDER_QUERY = new SqlQuery(
-            " select table_schema," +
-                    "        table_name," +
-                    "        column_name," +
-                    "        ordinal_position as position" +
-                    " from information_schema.columns" +
-                    " where table_name=?" +
-                    " order by position");
+  private static final SqlQuery COLUMN_ORDER_QUERY =
+      new SqlQuery(
+          " select table_schema,"
+              + "        table_name,"
+              + "        column_name,"
+              + "        ordinal_position as position"
+              + " from information_schema.columns"
+              + " where table_name=?"
+              + " order by position");
 
-    private BaseColumnOrdersFinder delegate;
+  private BaseColumnOrdersFinder delegate;
 
-    DefaultColumnOrdersFinder(DataSource dataSource) {
-        delegate = new BaseColumnOrdersFinder(dataSource, COLUMN_ORDER_QUERY);
-    }
+  DefaultColumnOrdersFinder(DataSource dataSource) {
+    delegate = new BaseColumnOrdersFinder(dataSource, COLUMN_ORDER_QUERY);
+  }
 
-    @Override
-    public List<String> findDatabaseColumnOrdersOf(String tableName) {
-        return delegate.findDatabaseColumnOrdersOf(tableName);
-    }
-
+  @Override
+  public List<String> findDatabaseColumnOrdersOf(String tableName) {
+    return delegate.findDatabaseColumnOrdersOf(tableName);
+  }
 }

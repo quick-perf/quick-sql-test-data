@@ -19,17 +19,18 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitPlatform.class)
 @SuiteDisplayName("Fast tests")
-@SelectClasses( {  H2Test.class
-                 , NotFullyManagedDatabaseTest.class
-                 , DatasetRowApiTest.class
-                 , SelectTest.class
-                 , UpdateTest.class
-                 , DeleteTest.class
-                 , InsertTest.class
-                 , H2DateTypesTest.class
-                 , SortInsertStatementsTest.class
-                 , SortInsertStatementsWithPkTest.class
-                 , DatasetRowsMergingTest.class
-                 , JdbcRoundtripTest.class} )
-public class FastTestSuite {
-}
+@SelectClasses({
+  H2Test.class,
+  NotFullyManagedDatabaseTest.class,
+  DatasetRowApiTest.class,
+  SelectTest.class,
+  UpdateTest.class,
+  DeleteTest.class,
+  InsertTest.class,
+  H2DateTypesTest.class,
+  SortInsertStatementsTest.class,
+  SortInsertStatementsWithPkTest.class,
+  DatasetRowsMergingTest.class,
+  JdbcRoundtripTest.class
+})
+public class FastTestSuite {}

@@ -19,32 +19,31 @@ import java.util.Map;
 
 class ColumnNamesComparator implements Comparator<String> {
 
-    private final Map<String, Integer> positionByColumnName;
+  private final Map<String, Integer> positionByColumnName;
 
-    private ColumnNamesComparator(Map<String, Integer> positionByColumnName) {
-        this.positionByColumnName = positionByColumnName;
+  private ColumnNamesComparator(Map<String, Integer> positionByColumnName) {
+    this.positionByColumnName = positionByColumnName;
+  }
+
+  public static ColumnNamesComparator from(List<String> orderedColumns) {
+    Map<String, Integer> positionByColumnName = buildIndexByColumnName(orderedColumns);
+    return new ColumnNamesComparator(positionByColumnName);
+  }
+
+  private static Map<String, Integer> buildIndexByColumnName(List<String> orderedColumns) {
+    final Map<String, Integer> positionByColumnName = new HashMap<>();
+    for (int i = 0; i < orderedColumns.size(); i++) {
+      positionByColumnName.put(orderedColumns.get(i), i + 1);
     }
+    return positionByColumnName;
+  }
 
-    public static ColumnNamesComparator from(List<String> orderedColumns) {
-        Map<String, Integer> positionByColumnName = buildIndexByColumnName(orderedColumns);
-        return new ColumnNamesComparator(positionByColumnName);
-    }
+  @Override
+  public int compare(String colName1, String colName2) {
+    return findPositionOf(colName1) - findPositionOf(colName2);
+  }
 
-    private static Map<String, Integer> buildIndexByColumnName(List<String> orderedColumns) {
-        final Map<String, Integer> positionByColumnName = new HashMap<>();
-        for (int i = 0; i < orderedColumns.size(); i++) {
-            positionByColumnName.put(orderedColumns.get(i), i + 1);
-        }
-        return positionByColumnName;
-    }
-
-    @Override
-    public int compare(String colName1, String colName2) {
-        return findPositionOf(colName1) - findPositionOf(colName2);
-    }
-
-    private int findPositionOf(String colName1) {
-        return positionByColumnName.get(colName1);
-    }
-
+  private int findPositionOf(String colName1) {
+    return positionByColumnName.get(colName1);
+  }
 }

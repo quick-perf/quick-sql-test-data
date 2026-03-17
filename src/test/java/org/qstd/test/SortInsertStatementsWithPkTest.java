@@ -12,172 +12,183 @@
  */
 package org.qstd.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.qstd.test.TestTable.buildUniqueTable;
+
+import java.util.List;
+import java.util.Random;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.qstd.QuickSqlTestData;
 
-import java.util.List;
-import java.util.Random;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.qstd.test.TestTable.buildUniqueTable;
-
 public class SortInsertStatementsWithPkTest extends H2Config {
 
-    @RepeatedTest(9) public void
-    should_sort_insert_statements_following_a_primary_key() {
+  @RepeatedTest(9)
+  public void should_sort_insert_statements_following_a_primary_key() {
 
-        TestTable table =
-                buildUniqueTable(DATA_SOURCE
-                                , "table_with_int_pk"
-                                , "col_id integer," +
-                                "colA  varchar(20), " +
-                                "colB  varchar(20), " +
-                                "constraint int_pk" + generateRandomPositiveInt() + " primary key (col_id)"
-                                )
-                .create()
-                .insertValues("2, 'A', 'B'")
-                .insertValues("10, 'C', 'D'")
-                .insertValues("1, 'E', 'F'");
+    TestTable table =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "table_with_int_pk",
+                "col_id integer,"
+                    + "colA  varchar(20), "
+                    + "colB  varchar(20), "
+                    + "constraint int_pk"
+                    + generateRandomPositiveInt()
+                    + " primary key (col_id)")
+            .create()
+            .insertValues("2, 'A', 'B'")
+            .insertValues("10, 'C', 'D'")
+            .insertValues("1, 'E', 'F'");
 
-        String selectAll = "SELECT * FROM " + table.getTableName();
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String selectAll = "SELECT * FROM " + table.getTableName();
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
 
-        // WHEN
-        List<String> insertStatements = quickSqlTestData.generateInsertListFor(selectAll);
+    // WHEN
+    List<String> insertStatements = quickSqlTestData.generateInsertListFor(selectAll);
 
-        // THEN
-        String insertStatementsAsString = insertStatements.toString();
+    // THEN
+    String insertStatementsAsString = insertStatements.toString();
 
-        String firstQuery = insertStatements.get(0);
-        assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1");
+    String firstQuery = insertStatements.get(0);
+    assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1");
 
-        String secondQuery = insertStatements.get(1);
-        assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2");
+    String secondQuery = insertStatements.get(1);
+    assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2");
 
-        String thirdQuery = insertStatements.get(2);
-        assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(10");
+    String thirdQuery = insertStatements.get(2);
+    assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(10");
+  }
 
-    }
+  // Not possible to both repeat and parameterize a JUnit 5 test
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "INT",
+        "TINYINT",
+        "SMALLINT",
+        "BIGINT"
+      }) // http://www.h2database.com/html/datatypes.html
+  public void should_sort_insert_statements_following_an_integer_primary_key(String intType) {
 
-    // Not possible to both repeat and parameterize a JUnit 5 test
-    @ParameterizedTest
-    @ValueSource(strings = {"INT", "TINYINT", "SMALLINT", "BIGINT"}) // http://www.h2database.com/html/datatypes.html
-    public void
-    should_sort_insert_statements_following_an_integer_primary_key(String intType) {
+    TestTable table =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "table_with_int_pk",
+                "col_id "
+                    + intType
+                    + ","
+                    + "colA  varchar(20), "
+                    + "colB  varchar(20), "
+                    + "constraint int_pk"
+                    + generateRandomPositiveInt()
+                    + " primary key (col_id)")
+            .create()
+            .insertValues("2, 'A', 'B'")
+            .insertValues("10, 'C', 'D'")
+            .insertValues("1, 'E', 'F'");
 
-        TestTable table =
-                buildUniqueTable(DATA_SOURCE
-                                , "table_with_int_pk"
-                                , "col_id " + intType + "," +
-                                "colA  varchar(20), " +
-                                "colB  varchar(20), " +
-                                "constraint int_pk" + generateRandomPositiveInt() + " primary key (col_id)"
-                                )
-                .create()
-                .insertValues("2, 'A', 'B'")
-                .insertValues("10, 'C', 'D'")
-                .insertValues("1, 'E', 'F'");
+    String selectAll = "SELECT * FROM " + table.getTableName();
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
 
-        String selectAll = "SELECT * FROM " + table.getTableName();
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    // WHEN
+    List<String> insertStatements = quickSqlTestData.generateInsertListFor(selectAll);
 
-        // WHEN
-        List<String> insertStatements = quickSqlTestData.generateInsertListFor(selectAll);
+    // THEN
+    String insertStatementsAsString = insertStatements.toString();
 
-        // THEN
-        String insertStatementsAsString = insertStatements.toString();
+    String firstQuery = insertStatements.get(0);
+    assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1");
 
-        String firstQuery = insertStatements.get(0);
-        assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1");
+    String secondQuery = insertStatements.get(1);
+    assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2");
 
-        String secondQuery = insertStatements.get(1);
-        assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2");
+    String thirdQuery = insertStatements.get(2);
+    assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(10");
+  }
 
-        String thirdQuery = insertStatements.get(2);
-        assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(10");
+  @RepeatedTest(9)
+  public void should_sort_insert_statements_following_a_composite_primary_key() {
 
-    }
+    // GIVEN
+    TestTable table =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "comp_pk",
+                "col_id1   integer,"
+                    + "col_id2   integer, "
+                    + "colA  varchar(20), "
+                    + "colB  varchar(20), "
+                    + "constraint comp_pk_pk"
+                    + generateRandomPositiveInt()
+                    + " primary key (col_id2, col_id1)")
+            .create()
+            .insertValues("1, 2, 'A', 'B'")
+            .insertValues("1, 1, 'C', 'D'")
+            .insertValues("2, 2, 'E', 'F'")
+            .insertValues("2, 1, 'G', 'H'");
 
-    @RepeatedTest(9) public void
-    should_sort_insert_statements_following_a_composite_primary_key() {
+    String selectAll = "SELECT * FROM " + table.getTableName();
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
 
-        // GIVEN
-        TestTable table =
-                buildUniqueTable(DATA_SOURCE
-                                , "comp_pk"
-                                , "col_id1   integer," +
-                                "col_id2   integer, " +
-                                "colA  varchar(20), " +
-                                "colB  varchar(20), " +
-                                "constraint comp_pk_pk" + generateRandomPositiveInt() + " primary key (col_id2, col_id1)"
-                                )
-                .create()
-                .insertValues("1, 2, 'A', 'B'")
-                .insertValues("1, 1, 'C', 'D'")
-                .insertValues("2, 2, 'E', 'F'")
-                .insertValues("2, 1, 'G', 'H'");
+    // WHEN
+    List<String> insertStatements = quickSqlTestData.generateInsertListFor(selectAll);
 
-        String selectAll = "SELECT * FROM " + table.getTableName();
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    // THEN
+    String insertStatementsAsString = insertStatements.toString();
 
-        // WHEN
-        List<String> insertStatements = quickSqlTestData.generateInsertListFor(selectAll);
+    String firstQuery = insertStatements.get(0);
+    assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1, 1");
 
-        // THEN
-        String insertStatementsAsString = insertStatements.toString();
+    String secondQuery = insertStatements.get(1);
+    assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2, 1");
 
-        String firstQuery = insertStatements.get(0);
-        assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(1, 1");
+    String thirdQuery = insertStatements.get(2);
+    assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(1, 2");
 
-        String secondQuery = insertStatements.get(1);
-        assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(2, 1");
+    String fourthQuery = insertStatements.get(3);
+    assertThat(fourthQuery).as(insertStatementsAsString).contains("VALUES(2, 2");
+  }
 
-        String thirdQuery = insertStatements.get(2);
-        assertThat(thirdQuery).as(insertStatementsAsString).contains("VALUES(1, 2");
+  @RepeatedTest(9)
+  public void should_not_sort_insert_statements_if_the_primary_is_not_of_int_type() {
 
-        String fourthQuery = insertStatements.get(3);
-        assertThat(fourthQuery).as(insertStatementsAsString).contains("VALUES(2, 2");
+    // GIVEN
+    TestTable table =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "table_with_boolean_pk",
+                "col_id "
+                    + "BOOLEAN"
+                    + ","
+                    + "colA  varchar(20), "
+                    + "colB  varchar(20), "
+                    + "constraint int_pk"
+                    + generateRandomPositiveInt()
+                    + " primary key (col_id)")
+            .create()
+            .insertValues("FALSE, 'A', 'B'")
+            .insertValues("TRUE, 'C', 'D'");
 
-    }
+    String selectAll = "SELECT * FROM " + table.getTableName();
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
 
-    @RepeatedTest(9) public void
-    should_not_sort_insert_statements_if_the_primary_is_not_of_int_type() {
+    // WHEN
+    List<String> insertStatements = quickSqlTestData.generateInsertListFor(selectAll);
 
-        // GIVEN
-        TestTable table =
-                buildUniqueTable(DATA_SOURCE
-                                , "table_with_boolean_pk"
-                                , "col_id " + "BOOLEAN" + "," +
-                                "colA  varchar(20), " +
-                                "colB  varchar(20), " +
-                                "constraint int_pk" + generateRandomPositiveInt() + " primary key (col_id)"
-                                )
-                .create()
-                .insertValues("FALSE, 'A', 'B'")
-                .insertValues("TRUE, 'C', 'D'");
+    // THEN
+    String insertStatementsAsString = insertStatements.toString();
 
-        String selectAll = "SELECT * FROM " + table.getTableName();
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String firstQuery = insertStatements.get(0);
+    assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(false");
 
-        // WHEN
-        List<String> insertStatements = quickSqlTestData.generateInsertListFor(selectAll);
+    String secondQuery = insertStatements.get(1);
+    assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(true");
+  }
 
-        // THEN
-        String insertStatementsAsString = insertStatements.toString();
-
-        String firstQuery = insertStatements.get(0);
-        assertThat(firstQuery).as(insertStatementsAsString).contains("VALUES(false");
-
-        String secondQuery = insertStatements.get(1);
-        assertThat(secondQuery).as(insertStatementsAsString).contains("VALUES(true");
-
-    }
-
-    private int generateRandomPositiveInt() {
-        Random random = new Random();
-        return Math.abs(random.nextInt());
-    }
-
+  private int generateRandomPositiveInt() {
+    Random random = new Random();
+    return Math.abs(random.nextInt());
+  }
 }

@@ -12,91 +12,91 @@
  */
 package org.qstd.test;
 
+import static org.qstd.test.TestTable.TestTableAssert.assertThat;
+import static org.qstd.test.TestTable.buildUniqueTable;
+
+import java.util.List;
+import java.util.Random;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.qstd.QuickSqlTestData;
 import org.testcontainers.containers.MariaDBContainer;
 
-import javax.sql.DataSource;
-import java.util.List;
-import java.util.Random;
-
-import static org.qstd.test.TestTable.TestTableAssert.assertThat;
-import static org.qstd.test.TestTable.buildUniqueTable;
-
 public class MariaDBSlowTest {
 
-    private static final String DB_USER_NAME = "user";
+  private static final String DB_USER_NAME = "user";
 
-    private static final String DB_PASSWORD = "pwd";
+  private static final String DB_PASSWORD = "pwd";
 
-    private static final MariaDBContainer MARIA_DB_CONTAINER
-            = new MariaDBContainer<>("mariadb:10.5.2")
-            .withDatabaseName("mariadb")
-            .withUsername(DB_USER_NAME)
-            .withPassword(DB_PASSWORD);
+  private static final MariaDBContainer MARIA_DB_CONTAINER =
+      new MariaDBContainer<>("mariadb:10.5.2")
+          .withDatabaseName("mariadb")
+          .withUsername(DB_USER_NAME)
+          .withPassword(DB_PASSWORD);
 
-    private static DataSource DATA_SOURCE;
+  private static DataSource DATA_SOURCE;
 
-    private static SqlExecutor SQL_EXECUTOR;
+  private static SqlExecutor SQL_EXECUTOR;
 
-    @BeforeAll
-    public static void beforeAll() {
-        MARIA_DB_CONTAINER.start();
-        String jdbcUrl = MARIA_DB_CONTAINER.getJdbcUrl();
-        DATA_SOURCE = DataSourceBuilder.INSTANCE.build(jdbcUrl, DB_USER_NAME, DB_PASSWORD);
-        SQL_EXECUTOR = new SqlExecutor(DATA_SOURCE);
-    }
+  @BeforeAll
+  public static void beforeAll() {
+    MARIA_DB_CONTAINER.start();
+    String jdbcUrl = MARIA_DB_CONTAINER.getJdbcUrl();
+    DATA_SOURCE = DataSourceBuilder.INSTANCE.build(jdbcUrl, DB_USER_NAME, DB_PASSWORD);
+    SQL_EXECUTOR = new SqlExecutor(DATA_SOURCE);
+  }
 
-    @Test public void
-    should_sort_insert_statements_following_table_dependencies() {
+  @Test
+  public void should_sort_insert_statements_following_table_dependencies() {
 
-        // GIVEN
-        TestTable teamTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Team"
-                                ," id bigint not null" +
-                                ",  name varchar(255)" +
-                                ",  primary key (id)")
-                        .create()
-                        .insertValues("1, 'Manchester United'");
+    // GIVEN
+    TestTable teamTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Team",
+                " id bigint not null" + ",  name varchar(255)" + ",  primary key (id)")
+            .create()
+            .insertValues("1, 'Manchester United'");
 
-        String playerTableConstraint = "add constraint player_team_fk" + generateRandomPositiveInt()
-                                     + " foreign key (team_id)"
-                                     + " references " + teamTable.getTableName() + " (id)";
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Player"
-                                , "id bigint not null"
-                                + ", firstName varchar(255)"
-                                + ", lastName varchar(255)"
-                                + ", team_id bigint"
-                                + ", primary key (id)")
-                        .create()
-                        .alter(playerTableConstraint)
-                        .insertValues("1, 'Paul', 'Pogba', 1");
+    String playerTableConstraint =
+        "add constraint player_team_fk"
+            + generateRandomPositiveInt()
+            + " foreign key (team_id)"
+            + " references "
+            + teamTable.getTableName()
+            + " (id)";
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "id bigint not null"
+                    + ", firstName varchar(255)"
+                    + ", lastName varchar(255)"
+                    + ", team_id bigint"
+                    + ", primary key (id)")
+            .create()
+            .alter(playerTableConstraint)
+            .insertValues("1, 'Paul', 'Pogba', 1");
 
-        // WHEN
-        String playerSelect = "SELECT * FROM " + playerTable.getTableName();
-        String teamSelect = "SELECT * FROM " + teamTable.getTableName();
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        List<String> insertStatements = quickSqlTestData.generateInsertListFor(playerSelect, teamSelect);
+    // WHEN
+    String playerSelect = "SELECT * FROM " + playerTable.getTableName();
+    String teamSelect = "SELECT * FROM " + teamTable.getTableName();
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    List<String> insertStatements =
+        quickSqlTestData.generateInsertListFor(playerSelect, teamSelect);
 
-        // THEN
-        playerTable.drop();
-        teamTable.drop().create();
-        playerTable.create().alter(playerTableConstraint);
-        SQL_EXECUTOR.execute(insertStatements);
-        assertThat(playerTable).withGeneratedInserts(insertStatements)
-                               .hasNumberOfRows(1);
-        assertThat(teamTable).withGeneratedInserts(insertStatements)
-                             .hasNumberOfRows(1);
+    // THEN
+    playerTable.drop();
+    teamTable.drop().create();
+    playerTable.create().alter(playerTableConstraint);
+    SQL_EXECUTOR.execute(insertStatements);
+    assertThat(playerTable).withGeneratedInserts(insertStatements).hasNumberOfRows(1);
+    assertThat(teamTable).withGeneratedInserts(insertStatements).hasNumberOfRows(1);
+  }
 
-    }
-
-    private int generateRandomPositiveInt() {
-        Random random = new Random();
-        return Math.abs(random.nextInt());
-    }
-
+  private int generateRandomPositiveInt() {
+    Random random = new Random();
+    return Math.abs(random.nextInt());
+  }
 }

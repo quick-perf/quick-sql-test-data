@@ -12,49 +12,45 @@
  */
 package org.qstd.test;
 
+import static org.qstd.dbtype.DatabaseMetadataFinderFactory.createDatabaseMetadataFinderFrom;
+import static org.qstd.test.TestTable.*;
+import static org.qstd.test.TestTable.TestTableAssert.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.qstd.DatabaseMetadataFinder;
 import org.qstd.QuickSqlTestData;
 import org.qstd.dbtype.DatabaseType;
 
-import static org.qstd.dbtype.DatabaseMetadataFinderFactory.createDatabaseMetadataFinderFrom;
-import static org.qstd.test.TestTable.*;
-import static org.qstd.test.TestTable.TestTableAssert.assertThat;
-
 public class NotFullyManagedDatabaseTest extends H2Config {
 
-    @Test public void
-    should_generate_insert_statements_without_necessarily_taking_account_of_database_constraints_if_the_database_is_not_supposed_to_be_fully_managed() {
+  @Test
+  public void
+      should_generate_insert_statements_without_necessarily_taking_account_of_database_constraints_if_the_database_is_not_supposed_to_be_fully_managed() {
 
-        // GIVEN
-        TestTable table =
-                buildUniqueTable(DATA_SOURCE
-                                , "Table"
-                                , "col1 varchar(25)"
-                                + ", col2 varchar(25)"
-                                + ", col3 varchar(25)"
-                                )
-                .create()
-                .insertValues("'val1', 'val2', 'val3'")
-                .insertValues("'val3', 'val4', 'val5'");
+    // GIVEN
+    TestTable table =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Table",
+                "col1 varchar(25)" + ", col2 varchar(25)" + ", col3 varchar(25)")
+            .create()
+            .insertValues("'val1', 'val2', 'val3'")
+            .insertValues("'val3', 'val4', 'val5'");
 
-        DatabaseMetadataFinder databaseMetadataFinderOfNotFullyManagedDatabase =
-                createDatabaseMetadataFinderFrom(DATA_SOURCE, DatabaseType.OTHER);
-        QuickSqlTestData quickSqlTestDataOfNotFullyManagedDatabase =
-                QuickSqlTestData.buildFrom(DATA_SOURCE, DatabaseType.OTHER
-                                             , databaseMetadataFinderOfNotFullyManagedDatabase);
+    DatabaseMetadataFinder databaseMetadataFinderOfNotFullyManagedDatabase =
+        createDatabaseMetadataFinderFrom(DATA_SOURCE, DatabaseType.OTHER);
+    QuickSqlTestData quickSqlTestDataOfNotFullyManagedDatabase =
+        QuickSqlTestData.buildFrom(
+            DATA_SOURCE, DatabaseType.OTHER, databaseMetadataFinderOfNotFullyManagedDatabase);
 
-        String select = "SELECT col1, col2 FROM " + table.getTableName();
+    String select = "SELECT col1, col2 FROM " + table.getTableName();
 
-        // WHEN
-        String insertScript = quickSqlTestDataOfNotFullyManagedDatabase.generateInsertScriptFor(select);
+    // WHEN
+    String insertScript = quickSqlTestDataOfNotFullyManagedDatabase.generateInsertScriptFor(select);
 
-        // THEN
-        table.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(table).withScript(insertScript)
-                         .hasNumberOfRows(2);
-
-    }
-
+    // THEN
+    table.recreate();
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(table).withScript(insertScript).hasNumberOfRows(2);
+  }
 }

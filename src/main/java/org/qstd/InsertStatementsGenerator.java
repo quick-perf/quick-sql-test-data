@@ -12,57 +12,55 @@
  */
 package org.qstd;
 
-import org.qstd.dbtype.DatabaseType;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import org.qstd.dbtype.DatabaseType;
+
 class InsertStatementsGenerator {
 
-    private final DatabaseType dbType;
+  private final DatabaseType dbType;
 
-    InsertStatementsGenerator(DatabaseType dbType) {
-        this.dbType = dbType;
-    }
+  InsertStatementsGenerator(DatabaseType dbType) {
+    this.dbType = dbType;
+  }
 
-    String generateInsertScriptFor(List<DatasetRow> datasetRows) {
-        return   datasetRows
-                .stream()
-                .map(this::generateInsertStatementFrom)
-                .map(insertStatement -> insertStatement + ";" + lineSeparator())
-                .collect(joining());
-    }
+  String generateInsertScriptFor(List<DatasetRow> datasetRows) {
+    return datasetRows.stream()
+        .map(this::generateInsertStatementFrom)
+        .map(insertStatement -> insertStatement + ";" + lineSeparator())
+        .collect(joining());
+  }
 
-    private String generateInsertStatementFrom(DatasetRow datasetRow) {
-        String tableName = datasetRow.getTableName();
-        Set<String> columnNames = datasetRow.getColumnNames();
-        Collection<Object> columnValues = datasetRow.getColumnValues();
-        return  "INSERT INTO " + tableName + "(" + formatColumnNames(columnNames) + ")"
-              + " VALUES(" + formatColumnValues(columnValues) + ")";
-    }
+  private String generateInsertStatementFrom(DatasetRow datasetRow) {
+    String tableName = datasetRow.getTableName();
+    Set<String> columnNames = datasetRow.getColumnNames();
+    Collection<Object> columnValues = datasetRow.getColumnValues();
+    return "INSERT INTO "
+        + tableName
+        + "("
+        + formatColumnNames(columnNames)
+        + ")"
+        + " VALUES("
+        + formatColumnValues(columnValues)
+        + ")";
+  }
 
-    private String formatColumnNames(Set<String> columnNames) {
-        return String.join(", ", columnNames);
-    }
+  private String formatColumnNames(Set<String> columnNames) {
+    return String.join(", ", columnNames);
+  }
 
-    private String formatColumnValues(Collection<Object> columnValues) {
-        return  columnValues
-               .stream()
-               .map(columnValue -> ColumnValueFormatter.INSTANCE
-                                  .formatColumnValue(columnValue, dbType))
-               .collect(joining(", "));
-    }
+  private String formatColumnValues(Collection<Object> columnValues) {
+    return columnValues.stream()
+        .map(columnValue -> ColumnValueFormatter.INSTANCE.formatColumnValue(columnValue, dbType))
+        .collect(joining(", "));
+  }
 
-    List<String> generateInsertStatementsFor(List<DatasetRow> datasetRows) {
-        return   datasetRows
-                .stream()
-                .map(this::generateInsertStatementFrom)
-                .collect(toList());
-    }
-
+  List<String> generateInsertStatementsFor(List<DatasetRow> datasetRows) {
+    return datasetRows.stream().map(this::generateInsertStatementFrom).collect(toList());
+  }
 }

@@ -12,51 +12,49 @@
  */
 package org.qstd.dbtype;
 
-import org.qstd.PreparedStatementBuilder;
-import org.qstd.PrimaryKeyColumnsFinder;
-import org.qstd.SqlQuery;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
+import org.qstd.PreparedStatementBuilder;
+import org.qstd.PrimaryKeyColumnsFinder;
+import org.qstd.SqlQuery;
 
 class BasePrimaryKeyColumnsFinder implements PrimaryKeyColumnsFinder {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    private final SqlQuery primaryKeyColumnsQuery;
+  private final SqlQuery primaryKeyColumnsQuery;
 
-    public BasePrimaryKeyColumnsFinder(DataSource dataSource, SqlQuery primaryKeyColumnsQuery) {
-        this.dataSource = dataSource;
-        this.primaryKeyColumnsQuery = primaryKeyColumnsQuery;
+  public BasePrimaryKeyColumnsFinder(DataSource dataSource, SqlQuery primaryKeyColumnsQuery) {
+    this.dataSource = dataSource;
+    this.primaryKeyColumnsQuery = primaryKeyColumnsQuery;
+  }
+
+  @Override
+  public List<String> findPrimaryColumnsOf(String tableName) {
+
+    List<String> primaryKeyColumns = new ArrayList<>();
+
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement primaryKeyColumnsStatement =
+            PreparedStatementBuilder.buildFrom(primaryKeyColumnsQuery, connection)) {
+
+      primaryKeyColumnsStatement.setString(1, tableName);
+      ResultSet queryResult = primaryKeyColumnsStatement.executeQuery();
+
+      while (queryResult.next()) {
+        String column = queryResult.getString(4);
+        primaryKeyColumns.add(column);
+      }
+
+    } catch (SQLException sqlException) {
+      sqlException.printStackTrace();
     }
 
-    @Override
-    public List<String> findPrimaryColumnsOf(String tableName) {
-
-        List<String> primaryKeyColumns = new ArrayList<>();
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement primaryKeyColumnsStatement = PreparedStatementBuilder.buildFrom(primaryKeyColumnsQuery, connection)) {
-
-            primaryKeyColumnsStatement.setString(1, tableName);
-            ResultSet queryResult = primaryKeyColumnsStatement.executeQuery();
-
-            while(queryResult.next()) {
-                String column = queryResult.getString(4);
-                primaryKeyColumns.add(column);
-            }
-
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-
-        return primaryKeyColumns;
-
-    }
-
+    return primaryKeyColumns;
+  }
 }

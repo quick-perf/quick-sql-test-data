@@ -16,13 +16,13 @@ import java.util.Optional;
 
 interface SelectTransformer {
 
-    SelectTransformer NO_SELECT_TRANSFORMER = new SelectTransformer() {
+  SelectTransformer NO_SELECT_TRANSFORMER =
+      new SelectTransformer() {
         @Override
         public Optional<SqlQuery> toSelect(SqlQuery sqlQuery) {
-            return Optional.empty();
+          return Optional.empty();
         }
-    };
+      };
 
-    Optional<SqlQuery> toSelect(SqlQuery sqlQuery);
-
+  Optional<SqlQuery> toSelect(SqlQuery sqlQuery);
 }

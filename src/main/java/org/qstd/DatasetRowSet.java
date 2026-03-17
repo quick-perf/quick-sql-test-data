@@ -12,83 +12,80 @@
  */
 package org.qstd;
 
-import org.qstd.dbtype.DatabaseType;
-
-import javax.sql.DataSource;
 import java.util.*;
 import java.util.function.Function;
+import javax.sql.DataSource;
+import org.qstd.dbtype.DatabaseType;
 
 class DatasetRowSet {
 
-    private final MissingNotNullColumnsFinder missingNotNullColumnsFinder;
+  private final MissingNotNullColumnsFinder missingNotNullColumnsFinder;
 
-    private final DatabaseMetadataFinder databaseMetadataFinder;
+  private final DatabaseMetadataFinder databaseMetadataFinder;
 
-    private final Collection<DatasetRow> datasetRows = new ArrayDeque<>();
+  private final Collection<DatasetRow> datasetRows = new ArrayDeque<>();
 
-    DatasetRowSet( DataSource dataSource
-                 , DatabaseType dbType
-                 , DatabaseMetadataFinder databaseMetadataFinder) {
-        this.databaseMetadataFinder = databaseMetadataFinder;
-        this.missingNotNullColumnsFinder = new MissingNotNullColumnsFinder(dataSource
-                                                                          , dbType
-                                                                          , databaseMetadataFinder);
+  DatasetRowSet(
+      DataSource dataSource, DatabaseType dbType, DatabaseMetadataFinder databaseMetadataFinder) {
+    this.databaseMetadataFinder = databaseMetadataFinder;
+    this.missingNotNullColumnsFinder =
+        new MissingNotNullColumnsFinder(dataSource, dbType, databaseMetadataFinder);
+  }
+
+  void add(Collection<DatasetRow> datasetRows) {
+    for (DatasetRow datasetRow : datasetRows) {
+      add(datasetRow);
     }
+  }
 
-    void add(Collection<DatasetRow> datasetRows) {
-        for (DatasetRow datasetRow : datasetRows) {
-            add(datasetRow);
-        }
+  private void add(DatasetRow datasetRow) {
+
+    Function<String, String> functionToHaveMetadataTableName =
+        databaseMetadataFinder.getFunctionToHaveMetadataTableName();
+    datasetRow.updateTableNameWith(functionToHaveMetadataTableName);
+
+    boolean rowIsMerged = datasetRow.mergeWithARowOf(datasetRows);
+
+    if (!rowIsMerged) {
+      Map<String, Object> missingNotNullColumns =
+          missingNotNullColumnsFinder.findMissingNoNullColumnsOf(datasetRow);
+      datasetRow.addColumnValues(missingNotNullColumns);
+
+      datasetRows.add(datasetRow);
+
+      Collection<DatasetRow> joinedRows = findJoinedRowsOf(datasetRow);
+      for (DatasetRow joinRow : joinedRows) {
+        add(joinRow);
+      }
     }
+  }
 
-    private void add(DatasetRow datasetRow) {
+  private Collection<DatasetRow> findJoinedRowsOf(DatasetRow datasetRow) {
+    String tableName = datasetRow.getTableName();
+    ColumnsMappingGroup columnsMappingGroup =
+        databaseMetadataFinder.findColumnsMappingsOf(tableName);
+    return datasetRow.extractJoinedRowsFrom(columnsMappingGroup);
+  }
 
-        Function<String, String> functionToHaveMetadataTableName = databaseMetadataFinder.getFunctionToHaveMetadataTableName();
-        datasetRow.updateTableNameWith(functionToHaveMetadataTableName);
+  List<DatasetRow> sort() {
+    sortColumnsFollowingDatabaseDeclaration(datasetRows);
+    return sortRows();
+  }
 
-        boolean rowIsMerged = datasetRow.mergeWithARowOf(datasetRows);
-
-        if (!rowIsMerged) {
-            Map<String, Object> missingNotNullColumns =
-                    missingNotNullColumnsFinder.findMissingNoNullColumnsOf(datasetRow);
-            datasetRow.addColumnValues(missingNotNullColumns);
-
-            datasetRows.add(datasetRow);
-
-            Collection<DatasetRow> joinedRows = findJoinedRowsOf(datasetRow);
-            for (DatasetRow joinRow : joinedRows) {
-                add(joinRow);
-            }
-        }
-
+  private void sortColumnsFollowingDatabaseDeclaration(Collection<DatasetRow> allRows) {
+    for (DatasetRow datasetRow : allRows) {
+      String tableName = datasetRow.getTableName();
+      List<String> databaseColumnOrders =
+          databaseMetadataFinder.findDatabaseColumnOrdersOf(tableName);
+      datasetRow.sortColumnsFollowing(databaseColumnOrders);
     }
+  }
 
-    private Collection<DatasetRow> findJoinedRowsOf(DatasetRow datasetRow) {
-        String tableName = datasetRow.getTableName();
-        ColumnsMappingGroup columnsMappingGroup =
-                databaseMetadataFinder.findColumnsMappingsOf(tableName);
-        return datasetRow.extractJoinedRowsFrom(columnsMappingGroup);
-    }
-
-    List<DatasetRow> sort() {
-        sortColumnsFollowingDatabaseDeclaration(datasetRows);
-        return sortRows();
-    }
-
-    private void sortColumnsFollowingDatabaseDeclaration(Collection<DatasetRow> allRows) {
-        for (DatasetRow datasetRow : allRows) {
-            String tableName = datasetRow.getTableName();
-            List<String> databaseColumnOrders = databaseMetadataFinder.findDatabaseColumnOrdersOf(tableName);
-            datasetRow.sortColumnsFollowing(databaseColumnOrders);
-        }
-    }
-
-    private List<DatasetRow> sortRows() {
-        List<DatasetRow> rowsAsList = new ArrayList<>(datasetRows);
-        Comparator<DatasetRow> datasetRowComparator =
-                DatasetRowComparatorBuilder.buildFrom(databaseMetadataFinder);
-        rowsAsList.sort(datasetRowComparator);
-        return rowsAsList;
-    }
-
+  private List<DatasetRow> sortRows() {
+    List<DatasetRow> rowsAsList = new ArrayList<>(datasetRows);
+    Comparator<DatasetRow> datasetRowComparator =
+        DatasetRowComparatorBuilder.buildFrom(databaseMetadataFinder);
+    rowsAsList.sort(datasetRowComparator);
+    return rowsAsList;
+  }
 }

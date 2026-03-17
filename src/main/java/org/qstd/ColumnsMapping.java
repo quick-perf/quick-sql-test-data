@@ -14,21 +14,21 @@ package org.qstd;
 
 public class ColumnsMapping {
 
-    private final ColumnMappingPart columnMappingPart1;
+  private final ColumnMappingPart columnMappingPart1;
 
-    private final ColumnMappingPart columnMappingPart2;
+  private final ColumnMappingPart columnMappingPart2;
 
-    public ColumnsMapping(ColumnMappingPart columnMappingPart1, ColumnMappingPart columnMappingPart2) {
-        this.columnMappingPart1 = columnMappingPart1;
-        this.columnMappingPart2 = columnMappingPart2;
-    }
+  public ColumnsMapping(
+      ColumnMappingPart columnMappingPart1, ColumnMappingPart columnMappingPart2) {
+    this.columnMappingPart1 = columnMappingPart1;
+    this.columnMappingPart2 = columnMappingPart2;
+  }
 
-    boolean hasMappingForColumn(String columnName) {
-        return columnMappingPart1.hasColumn(columnName);
-    }
+  boolean hasMappingForColumn(String columnName) {
+    return columnMappingPart1.hasColumn(columnName);
+  }
 
-    ColumnMappingPart getMapping() {
-        return columnMappingPart2;
-    }
-
+  ColumnMappingPart getMapping() {
+    return columnMappingPart2;
+  }
 }

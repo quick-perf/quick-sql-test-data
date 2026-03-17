@@ -16,6 +16,5 @@ import java.util.Collection;
 
 public interface NotNullColumnsFinder {
 
-    Collection<String> findNotNullColumnsOf(String tableName);
-
+  Collection<String> findNotNullColumnsOf(String tableName);
 }

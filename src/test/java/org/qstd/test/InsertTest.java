@@ -12,27 +12,27 @@
  */
 package org.qstd.test;
 
-import org.junit.jupiter.api.Test;
-import org.quickperf.sql.annotation.ExpectJdbcQueryExecution;
-import org.qstd.QuickSqlTestData;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+import org.qstd.QuickSqlTestData;
+import org.quickperf.sql.annotation.ExpectJdbcQueryExecution;
 
 public class InsertTest extends H2Config {
 
-    @Test public void
-    should_generate_an_empty_insert_script_for_an_insert_input() {
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String anInsertStatement = "INSERT INTO A_TABLE VALUES(1, 2, 3)";
-        String insertScript = quickSqlTestData.generateInsertScriptFor(anInsertStatement);
-        assertThat(insertScript).isEmpty();
-    }
+  @Test
+  public void should_generate_an_empty_insert_script_for_an_insert_input() {
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String anInsertStatement = "INSERT INTO A_TABLE VALUES(1, 2, 3)";
+    String insertScript = quickSqlTestData.generateInsertScriptFor(anInsertStatement);
+    assertThat(insertScript).isEmpty();
+  }
 
-    @Test @ExpectJdbcQueryExecution(0) public void
-    should_not_use_jdbc_execution_for_an_insert_input() {
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String anInsertStatement = "INSERT INTO A_TABLE VALUES(1, 2, 3)";
-        quickSqlTestData.generateInsertScriptFor(anInsertStatement);
-    }
-
+  @Test
+  @ExpectJdbcQueryExecution(0)
+  public void should_not_use_jdbc_execution_for_an_insert_input() {
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String anInsertStatement = "INSERT INTO A_TABLE VALUES(1, 2, 3)";
+    quickSqlTestData.generateInsertScriptFor(anInsertStatement);
+  }
 }

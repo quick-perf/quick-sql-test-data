@@ -12,31 +12,30 @@
  */
 package org.qstd.dbtype;
 
+import java.util.Collection;
+import javax.sql.DataSource;
 import org.qstd.NotNullColumnsFinder;
 import org.qstd.SqlQuery;
 
-import javax.sql.DataSource;
-import java.util.Collection;
-
 class DefaultNotNullColumnsFinder implements NotNullColumnsFinder {
 
-    private static final SqlQuery NOT_NULL_COLUMNS_QUERY = new SqlQuery(
-            "select table_schema as table_schema,\n" +
-                    "       table_name   as table_name,\n" +
-                    "       column_name  as not_null_column\n" +
-                    "from information_schema.columns\n" +
-                    "where is_nullable = 'NO'\n" +
-                    "  AND table_name=?");
+  private static final SqlQuery NOT_NULL_COLUMNS_QUERY =
+      new SqlQuery(
+          "select table_schema as table_schema,\n"
+              + "       table_name   as table_name,\n"
+              + "       column_name  as not_null_column\n"
+              + "from information_schema.columns\n"
+              + "where is_nullable = 'NO'\n"
+              + "  AND table_name=?");
 
-    private BaseNotNullColumnsFinder delegate;
+  private BaseNotNullColumnsFinder delegate;
 
-    DefaultNotNullColumnsFinder(DataSource dataSource) {
-        delegate = new BaseNotNullColumnsFinder(dataSource, NOT_NULL_COLUMNS_QUERY);
-    }
+  DefaultNotNullColumnsFinder(DataSource dataSource) {
+    delegate = new BaseNotNullColumnsFinder(dataSource, NOT_NULL_COLUMNS_QUERY);
+  }
 
-    @Override
-    public Collection<String> findNotNullColumnsOf(String tableName) {
-        return delegate.findNotNullColumnsOf(tableName);
-    }
-
+  @Override
+  public Collection<String> findNotNullColumnsOf(String tableName) {
+    return delegate.findNotNullColumnsOf(tableName);
+  }
 }

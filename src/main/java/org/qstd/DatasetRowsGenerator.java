@@ -12,38 +12,35 @@
  */
 package org.qstd;
 
-import org.qstd.dbtype.DatabaseType;
-
-import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.List;
+import javax.sql.DataSource;
+import org.qstd.dbtype.DatabaseType;
 
 class DatasetRowsGenerator {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    private final DatabaseType dbType;
+  private final DatabaseType dbType;
 
-    private final DatabaseMetadataFinder databaseMetadataFinder;
+  private final DatabaseMetadataFinder databaseMetadataFinder;
 
-    private final DatasetRowsFinder datasetRowsFinder;
+  private final DatasetRowsFinder datasetRowsFinder;
 
-    DatasetRowsGenerator(DataSource dataSource
-                       , DatabaseType dbType
-                       , DatabaseMetadataFinder databaseMetadataFinder) {
-        this.dataSource = dataSource;
-        this.dbType = dbType;
-        this.databaseMetadataFinder = databaseMetadataFinder;
-        this.datasetRowsFinder = new DatasetRowsFinder(dataSource);
+  DatasetRowsGenerator(
+      DataSource dataSource, DatabaseType dbType, DatabaseMetadataFinder databaseMetadataFinder) {
+    this.dataSource = dataSource;
+    this.dbType = dbType;
+    this.databaseMetadataFinder = databaseMetadataFinder;
+    this.datasetRowsFinder = new DatasetRowsFinder(dataSource);
+  }
+
+  List<DatasetRow> generateDatasetRowsFor(List<SqlQuery> sqlQueries) {
+    DatasetRowSet datasetRowSet = new DatasetRowSet(dataSource, dbType, databaseMetadataFinder);
+    for (SqlQuery sqlQuery : sqlQueries) {
+      Collection<DatasetRow> datasetRows = datasetRowsFinder.findDatasetRowsOf(sqlQuery);
+      datasetRowSet.add(datasetRows);
     }
-
-    List<DatasetRow> generateDatasetRowsFor(List<SqlQuery> sqlQueries) {
-        DatasetRowSet datasetRowSet = new DatasetRowSet(dataSource, dbType, databaseMetadataFinder);
-        for (SqlQuery sqlQuery : sqlQueries) {
-            Collection<DatasetRow> datasetRows = datasetRowsFinder.findDatasetRowsOf(sqlQuery);
-            datasetRowSet.add(datasetRows);
-        }
-        return datasetRowSet.sort();
-    }
-
+    return datasetRowSet.sort();
+  }
 }

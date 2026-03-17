@@ -12,38 +12,37 @@
  */
 package org.qstd.dbtype;
 
+import java.util.List;
+import javax.sql.DataSource;
 import org.qstd.PrimaryKeyColumnsFinder;
 import org.qstd.SqlQuery;
 
-import javax.sql.DataSource;
-import java.util.List;
-
 class DefaultPrimaryKeyColumnsFinder implements PrimaryKeyColumnsFinder {
 
-    private static final SqlQuery PRIMARY_COLUMNS_QUERY = new SqlQuery(
-            "select \n" +
-                    "     cons.table_schema,\n" +
-                    "     cons.table_name,\n" +
-                    "     cons.constraint_name,\n" +
-                    "     cols.column_name,\n" +
-                    "     cols.ordinal_position as position\n" +
-                    " from information_schema.table_constraints cons\n" +
-                    " join information_schema.key_column_usage cols on (cons.table_schema = cols.table_schema \n" +
-                    " and cons.table_name = cols.table_name\n" +
-                    " and cons.constraint_name = cols.constraint_name)\n" +
-                    " where cons.table_name = ?" + "\n" +
-                    " and cons.constraint_type='PRIMARY KEY'"
-    );
+  private static final SqlQuery PRIMARY_COLUMNS_QUERY =
+      new SqlQuery(
+          "select \n"
+              + "     cons.table_schema,\n"
+              + "     cons.table_name,\n"
+              + "     cons.constraint_name,\n"
+              + "     cols.column_name,\n"
+              + "     cols.ordinal_position as position\n"
+              + " from information_schema.table_constraints cons\n"
+              + " join information_schema.key_column_usage cols on (cons.table_schema = cols.table_schema \n"
+              + " and cons.table_name = cols.table_name\n"
+              + " and cons.constraint_name = cols.constraint_name)\n"
+              + " where cons.table_name = ?"
+              + "\n"
+              + " and cons.constraint_type='PRIMARY KEY'");
 
-    private final PrimaryKeyColumnsFinder delegate;
+  private final PrimaryKeyColumnsFinder delegate;
 
-    DefaultPrimaryKeyColumnsFinder(DataSource dataSource) {
-        delegate = new BasePrimaryKeyColumnsFinder(dataSource, PRIMARY_COLUMNS_QUERY);
-    }
+  DefaultPrimaryKeyColumnsFinder(DataSource dataSource) {
+    delegate = new BasePrimaryKeyColumnsFinder(dataSource, PRIMARY_COLUMNS_QUERY);
+  }
 
-    @Override
-    public List<String> findPrimaryColumnsOf(String tableName) {
-        return delegate.findPrimaryColumnsOf(tableName);
-    }
-
+  @Override
+  public List<String> findPrimaryColumnsOf(String tableName) {
+    return delegate.findPrimaryColumnsOf(tableName);
+  }
 }

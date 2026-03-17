@@ -12,33 +12,32 @@
  */
 package org.qstd.test;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import javax.sql.DataSource;
 
 public class SqlExecutor {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    SqlExecutor(DataSource dataSource) {
-        this.dataSource = dataSource;
+  SqlExecutor(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  void execute(List<String> queries) {
+    for (String query : queries) {
+      execute(query);
     }
+  }
 
-    void execute(List<String> queries) {
-        for (String query : queries) {
-            execute(query);
-        }
+  void execute(String sql) {
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.execute();
+    } catch (SQLException e) {
+      throw new IllegalStateException("Unable to execute " + System.lineSeparator() + sql, e);
     }
-
-    void execute(String sql) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.execute();
-        } catch (SQLException e) {
-            throw new IllegalStateException("Unable to execute " + System.lineSeparator() + sql, e);
-        }
-    }
-
+  }
 }

@@ -12,64 +12,60 @@
  */
 package org.qstd;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.schema.Column;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 class ColumnNamesExtractor {
 
-    static final ColumnNamesExtractor INSTANCE = new ColumnNamesExtractor();
+  static final ColumnNamesExtractor INSTANCE = new ColumnNamesExtractor();
 
-    private ColumnNamesExtractor() {
+  private ColumnNamesExtractor() {}
+
+  private static class ColumnExpressionVisitor extends ExpressionVisitorAdapter {
+
+    private String visitedColumnName;
+
+    @Override
+    public void visit(Column column) {
+      this.visitedColumnName = column.getColumnName();
     }
 
-    private static class ColumnExpressionVisitor extends ExpressionVisitorAdapter {
-
-        private String visitedColumnName;
-
-        @Override
-        public void visit(Column column) {
-            this.visitedColumnName = column.getColumnName();
-        }
-
-        String getVisitedColumnName() {
-            return visitedColumnName;
-        }
-
+    String getVisitedColumnName() {
+      return visitedColumnName;
     }
+  }
 
-    Set<String> findColumnNamesOf(Expression expression) {
-        Set<String> columnNames = new HashSet<>();
-        if (expression instanceof BinaryExpression) {
-            // AndExpression, OrExpression, LikeExpression, ...
-            BinaryExpression binaryExpression = (BinaryExpression) expression;
-            Collection<String> leftRightColumnNames = extractColumnNamesOf(binaryExpression);
-            columnNames.addAll(leftRightColumnNames);
-        } else if (expression != null) {
-            // Column names
-            ColumnExpressionVisitor columnExpressionVisitor = new ColumnExpressionVisitor();
-            expression.accept(columnExpressionVisitor);
-            String visitedColumnName = columnExpressionVisitor.getVisitedColumnName();
-            if(visitedColumnName != null) {
-                columnNames.add(visitedColumnName);
-            }
-        }
-        return columnNames;
+  Set<String> findColumnNamesOf(Expression expression) {
+    Set<String> columnNames = new HashSet<>();
+    if (expression instanceof BinaryExpression) {
+      // AndExpression, OrExpression, LikeExpression, ...
+      BinaryExpression binaryExpression = (BinaryExpression) expression;
+      Collection<String> leftRightColumnNames = extractColumnNamesOf(binaryExpression);
+      columnNames.addAll(leftRightColumnNames);
+    } else if (expression != null) {
+      // Column names
+      ColumnExpressionVisitor columnExpressionVisitor = new ColumnExpressionVisitor();
+      expression.accept(columnExpressionVisitor);
+      String visitedColumnName = columnExpressionVisitor.getVisitedColumnName();
+      if (visitedColumnName != null) {
+        columnNames.add(visitedColumnName);
+      }
     }
+    return columnNames;
+  }
 
-    private Collection<String> extractColumnNamesOf(BinaryExpression binaryExpression) {
-        Collection<String> leftRightColumnNames = new ArrayList<>();
-        Collection<String> leftColumnNames = findColumnNamesOf(binaryExpression.getLeftExpression());
-        Collection<String> rightColumnNames = findColumnNamesOf(binaryExpression.getRightExpression());
-        leftRightColumnNames.addAll(leftColumnNames);
-        leftRightColumnNames.addAll(rightColumnNames);
-        return leftRightColumnNames;
-    }
-
+  private Collection<String> extractColumnNamesOf(BinaryExpression binaryExpression) {
+    Collection<String> leftRightColumnNames = new ArrayList<>();
+    Collection<String> leftColumnNames = findColumnNamesOf(binaryExpression.getLeftExpression());
+    Collection<String> rightColumnNames = findColumnNamesOf(binaryExpression.getRightExpression());
+    leftRightColumnNames.addAll(leftColumnNames);
+    leftRightColumnNames.addAll(rightColumnNames);
+    return leftRightColumnNames;
+  }
 }

@@ -12,75 +12,77 @@
  */
 package org.qstd.test;
 
-import org.junit.jupiter.api.Test;
-import org.qstd.QuickSqlTestData;
-
 import static org.qstd.test.TestTable.TestTableAssert.assertThat;
 import static org.qstd.test.TestTable.buildUniqueTable;
 
+import org.junit.jupiter.api.Test;
+import org.qstd.QuickSqlTestData;
+
 public class DeleteTest extends H2Config {
 
-    @Test
-    public void
-    should_generate_insert_if_all_rows_are_deleted_and_no_mandatory_columns() {
+  @Test
+  public void should_generate_insert_if_all_rows_are_deleted_and_no_mandatory_columns() {
 
-        // GIVEN
-        TestTable table1 =
-                buildUniqueTable(DATA_SOURCE
-                                , "Table_1"
-                                , "  id bigint"
-                                + ", Col_A varchar(255)"
-                                + ", Col_B varchar(255)"
-                                + ", Col_dec decimal")
-                .create()
-                .insertValues("1, 'A1', 'B1', 1.80")
-                .insertValues("2, 'A2', 'B2', 2.99");
+    // GIVEN
+    TestTable table1 =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Table_1",
+                "  id bigint"
+                    + ", Col_A varchar(255)"
+                    + ", Col_B varchar(255)"
+                    + ", Col_dec decimal")
+            .create()
+            .insertValues("1, 'A1', 'B1', 1.80")
+            .insertValues("2, 'A2', 'B2', 2.99");
 
-        String deleteQuery = "DELETE FROM " + table1.getTableName();
+    String deleteQuery = "DELETE FROM " + table1.getTableName();
 
-        // WHEN
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(deleteQuery);
+    // WHEN
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(deleteQuery);
 
-        // THEN
-        table1.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(table1).withScript(insertScript)
-                          .hasNumberOfRows(2)
-                          .row(0).hasValues(1, "A1", "B1", 1.80)
-                          .row(1).hasValues(2, "A2", "B2", 2.99);
-    }
+    // THEN
+    table1.recreate();
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(table1)
+        .withScript(insertScript)
+        .hasNumberOfRows(2)
+        .row(0)
+        .hasValues(1, "A1", "B1", 1.80)
+        .row(1)
+        .hasValues(2, "A2", "B2", 2.99);
+  }
 
-    @Test
-    public void
-    should_generate_one_insert_if_one_rows_is_deleted() {
+  @Test
+  public void should_generate_one_insert_if_one_rows_is_deleted() {
 
-        // GIVEN
-        TestTable table1 =
-                buildUniqueTable(DATA_SOURCE
-                                , "Table_1"
-                                , "  id bigint"
-                                + ", Col_A varchar(255)"
-                                + ", Col_B varchar(255)"
-                                + ", Col_dec decimal")
-                .create()
-                .insertValues("1, 'A1', 'B1', 1.80")
-                .insertValues("2, 'A2', 'B2', 2.99");
+    // GIVEN
+    TestTable table1 =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Table_1",
+                "  id bigint"
+                    + ", Col_A varchar(255)"
+                    + ", Col_B varchar(255)"
+                    + ", Col_dec decimal")
+            .create()
+            .insertValues("1, 'A1', 'B1', 1.80")
+            .insertValues("2, 'A2', 'B2', 2.99");
 
-        String updateQuery = "DELETE FROM " + table1.getTableName()
-                           + " WHERE Col_A = 'A1'";
+    String updateQuery = "DELETE FROM " + table1.getTableName() + " WHERE Col_A = 'A1'";
 
-        // WHEN
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        String insertScript = quickSqlTestData.generateInsertScriptFor(updateQuery);
+    // WHEN
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    String insertScript = quickSqlTestData.generateInsertScriptFor(updateQuery);
 
-        // THEN
-        table1.recreate();
-        SQL_EXECUTOR.execute(insertScript);
-        assertThat(table1).withScript(insertScript)
-                          .hasNumberOfRows(1)
-                          .row(0).hasValues(1, "A1", "B1", 1.80);
-
-    }
-
+    // THEN
+    table1.recreate();
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(table1)
+        .withScript(insertScript)
+        .hasNumberOfRows(1)
+        .row(0)
+        .hasValues(1, "A1", "B1", 1.80);
+  }
 }

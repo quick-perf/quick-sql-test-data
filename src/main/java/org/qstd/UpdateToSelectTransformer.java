@@ -12,66 +12,62 @@
  */
 package org.qstd;
 
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.update.Update;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.update.Update;
 
 class UpdateToSelectTransformer implements SelectTransformer {
 
-    private Update updateStatement;
+  private Update updateStatement;
 
-    UpdateToSelectTransformer(Update update) {
-        updateStatement = update;
-    }
+  UpdateToSelectTransformer(Update update) {
+    updateStatement = update;
+  }
 
-    @Override
-    public Optional<SqlQuery> toSelect(SqlQuery sqlQuery)  {
-        String tableName = updateStatement.getTable().getName();
-        String selectAsString = " SELECT " + findSelectedColumnsSeparatedWithCommas()
-                              + " FROM " + tableName
-                              + findWhereClauseIfExists();
-        List<Object> parameters = sqlQuery.getParameters();
-        SqlQuery selectQuery = new SqlQuery(selectAsString, parameters);
-        return Optional.of(selectQuery);
-    }
+  @Override
+  public Optional<SqlQuery> toSelect(SqlQuery sqlQuery) {
+    String tableName = updateStatement.getTable().getName();
+    String selectAsString =
+        " SELECT "
+            + findSelectedColumnsSeparatedWithCommas()
+            + " FROM "
+            + tableName
+            + findWhereClauseIfExists();
+    List<Object> parameters = sqlQuery.getParameters();
+    SqlQuery selectQuery = new SqlQuery(selectAsString, parameters);
+    return Optional.of(selectQuery);
+  }
 
-    private String findSelectedColumnsSeparatedWithCommas() {
-        Collection<String> columns = findColumnsToSelect();
-        return String.join(", ", columns);
-    }
+  private String findSelectedColumnsSeparatedWithCommas() {
+    Collection<String> columns = findColumnsToSelect();
+    return String.join(", ", columns);
+  }
 
-    private Collection<String> findColumnsToSelect() {
-        Collection<String> columnNames = findUpdatedColumnNames();
-        Collection<String> columnsToSelect = new ArrayList<>(columnNames);
-        Collection<String> whereColumnNames = findWhereColumnNames();
-        columnsToSelect.addAll(whereColumnNames);
-        return columnsToSelect;
-    }
+  private Collection<String> findColumnsToSelect() {
+    Collection<String> columnNames = findUpdatedColumnNames();
+    Collection<String> columnsToSelect = new ArrayList<>(columnNames);
+    Collection<String> whereColumnNames = findWhereColumnNames();
+    columnsToSelect.addAll(whereColumnNames);
+    return columnsToSelect;
+  }
 
-    private List<String> findUpdatedColumnNames() {
-        return   updateStatement
-                .getColumns()
-                .stream()
-                .map(Column::getColumnName)
-                .collect(toList());
-    }
+  private List<String> findUpdatedColumnNames() {
+    return updateStatement.getColumns().stream().map(Column::getColumnName).collect(toList());
+  }
 
-    private String findWhereClauseIfExists() {
-        Expression whereExpression = updateStatement.getWhere();
-        return   whereExpression == null ? ""
-                :" WHERE " + whereExpression;
-    }
+  private String findWhereClauseIfExists() {
+    Expression whereExpression = updateStatement.getWhere();
+    return whereExpression == null ? "" : " WHERE " + whereExpression;
+  }
 
-    private Collection<String> findWhereColumnNames() {
-        Expression whereExpression = updateStatement.getWhere();
-        return ColumnNamesExtractor.INSTANCE.findColumnNamesOf(whereExpression);
-    }
-
+  private Collection<String> findWhereColumnNames() {
+    Expression whereExpression = updateStatement.getWhere();
+    return ColumnNamesExtractor.INSTANCE.findColumnNamesOf(whereExpression);
+  }
 }

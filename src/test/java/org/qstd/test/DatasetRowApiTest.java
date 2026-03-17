@@ -12,47 +12,45 @@
  */
 package org.qstd.test;
 
+import static org.qstd.test.TestTable.TestTableAssert.assertThat;
+import static org.qstd.test.TestTable.buildUniqueTable;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.qstd.DatasetRow;
 import org.qstd.QuickSqlTestData;
 
-import java.util.List;
-
-import static org.qstd.test.TestTable.TestTableAssert.assertThat;
-import static org.qstd.test.TestTable.buildUniqueTable;
-
 public class DatasetRowApiTest extends H2Config {
 
-    @Test public void
-    should_generate_working_insert_from_a_dataset_row() {
+  @Test
+  public void should_generate_working_insert_from_a_dataset_row() {
 
-        // GIVEN
-        TestTable playerTable =
-                buildUniqueTable(DATA_SOURCE
-                                , "Player"
-                                , "  id bigint"
-                                + ", firstName varchar(255)"
-                                + ", lastName varchar(255)")
-                .create()
-                .insertValues("1, 'Paul', 'Pogba'");
+    // GIVEN
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "  id bigint" + ", firstName varchar(255)" + ", lastName varchar(255)")
+            .create()
+            .insertValues("1, 'Paul', 'Pogba'");
 
-        // WHEN
-        DatasetRow datasetRow =
-                DatasetRow.ofTable(playerTable.getTableName())
-                .addColumnValue("id", 1)
-                .addColumnValue("firstName", "Paul")
-                .addColumnValue("lastName", "Pogba");
+    // WHEN
+    DatasetRow datasetRow =
+        DatasetRow.ofTable(playerTable.getTableName())
+            .addColumnValue("id", 1)
+            .addColumnValue("firstName", "Paul")
+            .addColumnValue("lastName", "Pogba");
 
-        QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
-        List<String> insertStatements = quickSqlTestData.generateInsertListFor(datasetRow);
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+    List<String> insertStatements = quickSqlTestData.generateInsertListFor(datasetRow);
 
-        // THEN
-        playerTable.recreate();
-        SQL_EXECUTOR.execute(insertStatements);
-        assertThat(playerTable).withGeneratedInserts(insertStatements)
-                               .hasNumberOfRows(1)
-                               .row(0).hasValues(1, "Paul", "Pogba");
-
-    }
-
+    // THEN
+    playerTable.recreate();
+    SQL_EXECUTOR.execute(insertStatements);
+    assertThat(playerTable)
+        .withGeneratedInserts(insertStatements)
+        .hasNumberOfRows(1)
+        .row(0)
+        .hasValues(1, "Paul", "Pogba");
+  }
 }

@@ -12,49 +12,47 @@
  */
 package org.qstd;
 
-import org.qstd.dbtype.DatabaseType;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import javax.sql.DataSource;
+import org.qstd.dbtype.DatabaseType;
 
 class RowFinder {
 
-    private final DataSource dataSource;
+  private final DataSource dataSource;
 
-    private final DatabaseType dbType;
+  private final DatabaseType dbType;
 
-    RowFinder(DataSource dataSource, DatabaseType dbType) {
-        this.dataSource = dataSource;
-        this.dbType = dbType;
+  RowFinder(DataSource dataSource, DatabaseType dbType) {
+    this.dataSource = dataSource;
+    this.dbType = dbType;
+  }
+
+  DatasetRow findOneRowFrom(
+      String tableName, Collection<String> columnNamesToSearch, DatasetRow rowToSearch) {
+
+    SqlQuery missingColumnValuesQuery =
+        SqlQuery.buildFromRow(columnNamesToSearch, rowToSearch, dbType);
+
+    DatasetRow missingColumnValues = DatasetRow.ofTable(tableName);
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement missingColumnStatement =
+            PreparedStatementBuilder.buildFrom(missingColumnValuesQuery, connection)) {
+      ResultSet queryResult = missingColumnStatement.executeQuery();
+
+      queryResult.next(); // We keep only the first row found
+
+      for (String missingColumnName : columnNamesToSearch) {
+        Object columnValue = queryResult.getObject(missingColumnName);
+        missingColumnValues.addColumnValue(missingColumnName, columnValue);
+      }
+    } catch (SQLException sqlException) {
+      System.err.println("Unable to execute " + missingColumnValuesQuery);
+      sqlException.printStackTrace();
     }
-
-    DatasetRow findOneRowFrom(String tableName
-                            , Collection<String> columnNamesToSearch
-                            , DatasetRow rowToSearch) {
-
-        SqlQuery missingColumnValuesQuery =
-                SqlQuery.buildFromRow(columnNamesToSearch, rowToSearch, dbType);
-
-        DatasetRow missingColumnValues = DatasetRow.ofTable(tableName);
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement missingColumnStatement = PreparedStatementBuilder.buildFrom(missingColumnValuesQuery, connection)) {
-            ResultSet queryResult = missingColumnStatement.executeQuery();
-
-            queryResult.next(); // We keep only the first row found
-
-            for (String missingColumnName : columnNamesToSearch) {
-                Object columnValue = queryResult.getObject(missingColumnName);
-                missingColumnValues.addColumnValue(missingColumnName, columnValue);
-            }
-        } catch (SQLException sqlException) {
-            System.err.println("Unable to execute " + missingColumnValuesQuery);
-            sqlException.printStackTrace();
-        }
-        return missingColumnValues;
-    }
-
+    return missingColumnValues;
+  }
 }

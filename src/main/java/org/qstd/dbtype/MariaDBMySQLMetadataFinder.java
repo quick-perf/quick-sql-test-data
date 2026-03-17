@@ -12,75 +12,76 @@
  */
 package org.qstd.dbtype;
 
-import org.qstd.*;
-
-import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import javax.sql.DataSource;
+import org.qstd.*;
 
 class MariaDBMySQLMetadataFinder implements DatabaseMetadataFinder {
 
-    private static final SqlQuery MARIA_DB_MY_SQL_COLUMNS_MAPPINGS_QUERY
-            = new SqlQuery("select\n" +
-            "       child_constraint.table_schema            as table_schema,\n" +
-            "       child_constraint.table_name              as table_name,\n" +
-            "       child_cons_cols.column_name              as column_name,\n" +
-            "       child_cons_cols.referenced_table_schema  as ref_table_schema,\n" +
-            "       child_cons_cols.referenced_table_name    as ref_table_name,\n" +
-            "       child_cons_cols.referenced_column_name   as ref_column_name\n" +
-            "  from information_schema.table_constraints as child_constraint\n" +
-            "  join information_schema.key_column_usage as child_cons_cols\n" +
-            "       on (child_constraint.constraint_schema = child_cons_cols.constraint_schema\n" +
-            "           and\n" +
-            "           child_constraint.constraint_name = child_cons_cols.constraint_name\n" +
-            "           and\n" +
-            "           child_constraint.table_schema = child_cons_cols.table_schema\n" +
-            "           and\n" +
-            "           child_constraint.table_name = child_cons_cols.table_name)\n" +
-            "where child_constraint.constraint_type = 'FOREIGN KEY' and child_constraint.table_name=?");
+  private static final SqlQuery MARIA_DB_MY_SQL_COLUMNS_MAPPINGS_QUERY =
+      new SqlQuery(
+          "select\n"
+              + "       child_constraint.table_schema            as table_schema,\n"
+              + "       child_constraint.table_name              as table_name,\n"
+              + "       child_cons_cols.column_name              as column_name,\n"
+              + "       child_cons_cols.referenced_table_schema  as ref_table_schema,\n"
+              + "       child_cons_cols.referenced_table_name    as ref_table_name,\n"
+              + "       child_cons_cols.referenced_column_name   as ref_column_name\n"
+              + "  from information_schema.table_constraints as child_constraint\n"
+              + "  join information_schema.key_column_usage as child_cons_cols\n"
+              + "       on (child_constraint.constraint_schema = child_cons_cols.constraint_schema\n"
+              + "           and\n"
+              + "           child_constraint.constraint_name = child_cons_cols.constraint_name\n"
+              + "           and\n"
+              + "           child_constraint.table_schema = child_cons_cols.table_schema\n"
+              + "           and\n"
+              + "           child_constraint.table_name = child_cons_cols.table_name)\n"
+              + "where child_constraint.constraint_type = 'FOREIGN KEY' and child_constraint.table_name=?");
 
-    private final DefaultColumnOrdersFinder defaultColumnOrdersFinder;
+  private final DefaultColumnOrdersFinder defaultColumnOrdersFinder;
 
-    private final NotNullColumnsFinder defaultNotNullColumnsFinder;
+  private final NotNullColumnsFinder defaultNotNullColumnsFinder;
 
-    private final PostgreSqlMariaDbReferencedTablesFinder postgreSqlMariaDbReferencedTablesFinder;
+  private final PostgreSqlMariaDbReferencedTablesFinder postgreSqlMariaDbReferencedTablesFinder;
 
-    private final BaseColumnsMappingsFinder mariaDbMySqlColumnsMappingsFinder;
+  private final BaseColumnsMappingsFinder mariaDbMySqlColumnsMappingsFinder;
 
-    private final PrimaryKeyColumnsFinder primaryKeyColumnsFinder;
+  private final PrimaryKeyColumnsFinder primaryKeyColumnsFinder;
 
-    MariaDBMySQLMetadataFinder(DataSource dataSource) {
-        this.defaultColumnOrdersFinder = new DefaultColumnOrdersFinder(dataSource);
-        this.defaultNotNullColumnsFinder = new DefaultNotNullColumnsFinder(dataSource);
-        this.postgreSqlMariaDbReferencedTablesFinder = new PostgreSqlMariaDbReferencedTablesFinder(dataSource);
-        this.mariaDbMySqlColumnsMappingsFinder = new BaseColumnsMappingsFinder(dataSource, MARIA_DB_MY_SQL_COLUMNS_MAPPINGS_QUERY);
-        this.primaryKeyColumnsFinder = new DefaultPrimaryKeyColumnsFinder(dataSource);
-    }
+  MariaDBMySQLMetadataFinder(DataSource dataSource) {
+    this.defaultColumnOrdersFinder = new DefaultColumnOrdersFinder(dataSource);
+    this.defaultNotNullColumnsFinder = new DefaultNotNullColumnsFinder(dataSource);
+    this.postgreSqlMariaDbReferencedTablesFinder =
+        new PostgreSqlMariaDbReferencedTablesFinder(dataSource);
+    this.mariaDbMySqlColumnsMappingsFinder =
+        new BaseColumnsMappingsFinder(dataSource, MARIA_DB_MY_SQL_COLUMNS_MAPPINGS_QUERY);
+    this.primaryKeyColumnsFinder = new DefaultPrimaryKeyColumnsFinder(dataSource);
+  }
 
-    @Override
-    public List<String> findDatabaseColumnOrdersOf(String tableName) {
-        return defaultColumnOrdersFinder.findDatabaseColumnOrdersOf(tableName);
-    }
+  @Override
+  public List<String> findDatabaseColumnOrdersOf(String tableName) {
+    return defaultColumnOrdersFinder.findDatabaseColumnOrdersOf(tableName);
+  }
 
-    @Override
-    public Collection<String> findNotNullColumnsOf(String tableName) {
-        return defaultNotNullColumnsFinder.findNotNullColumnsOf(tableName);
-    }
+  @Override
+  public Collection<String> findNotNullColumnsOf(String tableName) {
+    return defaultNotNullColumnsFinder.findNotNullColumnsOf(tableName);
+  }
 
-    @Override
-    public ReferencedTableSet findReferencedTablesOf(String tableName) {
-        return postgreSqlMariaDbReferencedTablesFinder.findReferencedTablesOf(tableName);
-    }
+  @Override
+  public ReferencedTableSet findReferencedTablesOf(String tableName) {
+    return postgreSqlMariaDbReferencedTablesFinder.findReferencedTablesOf(tableName);
+  }
 
-    @Override
-    public ColumnsMappingGroup findColumnsMappingsOf(String tableName) {
-        return mariaDbMySqlColumnsMappingsFinder.findColumnsMappingsOf(tableName);
-    }
+  @Override
+  public ColumnsMappingGroup findColumnsMappingsOf(String tableName) {
+    return mariaDbMySqlColumnsMappingsFinder.findColumnsMappingsOf(tableName);
+  }
 
-    @Override
-    public List<String> findPrimaryColumnsOf(String tableName) {
-        return Collections.emptyList();
-    }
-
+  @Override
+  public List<String> findPrimaryColumnsOf(String tableName) {
+    return Collections.emptyList();
+  }
 }
