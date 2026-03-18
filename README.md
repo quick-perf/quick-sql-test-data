@@ -32,6 +32,14 @@ The library automatically:
 
 _[Another project](https://github.com/quick-perf/quick-sql-test-data-web) provides a web page to ease the use of the _Quick SQL test data_ library._
 
+## Why use this library and not AI?
+
+- Correctness (real database constraints managed)
+- Deterministic (never hallucinates)
+- Faster than AI
+- No token costs
+- No data leakage (data stay local)
+
 ## How to use the library
 
 With Maven, you have to add the following dependency:
