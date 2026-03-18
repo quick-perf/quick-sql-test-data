@@ -5,7 +5,7 @@
          alt="Maven Central">
   </a>
   &nbsp;&nbsp;
-  <a href="https://github.com/quick-perf/quick-sql-test-data/blob/master/LICENSE.txt">
+  <a href="https://github.com/quick-perf/quick-sql-test-data/blob/main/LICENSE.txt">
     <img src="https://img.shields.io/badge/license-Apache2-blue.svg"
          alt = "License">
   </a>
