@@ -131,6 +131,18 @@ public class QuickSqlTestData {
   }
 
   /**
+   * Generates an SQL insertion script from a DatasetRow object. This script contains INSERT
+   * statements taking into account the database integrity constraints.
+   *
+   * @param datasetRow A dataset row
+   * @return An SQL script allowing to create in database the dataset row given in parameter
+   */
+  public String generateInsertScriptFor(DatasetRow datasetRow) {
+    SqlQuery sqlQuery = SqlQuery.buildFromRow(datasetRow, dbType);
+    return generateInsertScriptFor(sqlQuery.toString());
+  }
+
+  /**
    * Generates a list of INSERT statements allowing to create in database the dataset row given in
    * parameter. These INSERT statements take into account the database integrity constraints.
    *

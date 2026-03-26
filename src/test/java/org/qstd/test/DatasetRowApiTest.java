@@ -23,6 +23,39 @@ import org.qstd.QuickSqlTestData;
 public class DatasetRowApiTest extends H2Config {
 
   @Test
+  public void should_generate_an_insert_script_from_a_dataset_row() {
+
+    // GIVEN
+    TestTable playerTable =
+        buildUniqueTable(
+                DATA_SOURCE,
+                "Player",
+                "  id bigint" + ", firstName varchar(255)" + ", lastName varchar(255)")
+            .create()
+            .insertValues("1, 'Paul', 'Pogba'");
+
+    DatasetRow datasetRow =
+        DatasetRow.ofTable(playerTable.getTableName())
+            .addColumnValue("id", 1)
+            .addColumnValue("firstName", "Paul")
+            .addColumnValue("lastName", "Pogba");
+
+    QuickSqlTestData quickSqlTestData = QuickSqlTestData.buildFrom(DATA_SOURCE);
+
+    // WHEN
+    String insertScript = quickSqlTestData.generateInsertScriptFor(datasetRow);
+
+    // THEN
+    playerTable.recreate();
+    SQL_EXECUTOR.execute(insertScript);
+    assertThat(playerTable)
+        .withScript(insertScript)
+        .hasNumberOfRows(1)
+        .row(0)
+        .hasValues(1, "Paul", "Pogba");
+  }
+
+  @Test
   public void should_generate_working_insert_from_a_dataset_row() {
 
     // GIVEN
