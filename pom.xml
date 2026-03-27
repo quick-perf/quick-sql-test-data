@@ -35,7 +35,7 @@
         <license.dir>${basedir}</license.dir>
         <currentYear>2022</currentYear>
         <project.build.outputTimestamp>10</project.build.outputTimestamp>
-        <testcontainers.version>1.17.3</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
     </properties>
 
     <dependencyManagement>
@@ -259,7 +259,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <id>enforce-bytecode-version</id>
@@ -284,7 +284,7 @@
                     <dependency>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>extra-enforcer-rules</artifactId>
-                        <version>1.2</version>
+                        <version>1.12.0</version>
                     </dependency>
                 </dependencies>
             </plugin>

@@ -30,7 +30,7 @@ public class MariaDBSlowTest {
   private static final String DB_PASSWORD = "pwd";
 
   private static final MariaDBContainer MARIA_DB_CONTAINER =
-      new MariaDBContainer<>("mariadb:10.5.2")
+      new MariaDBContainer<>("mariadb:11.4")
           .withDatabaseName("mariadb")
           .withUsername(DB_USER_NAME)
           .withPassword(DB_PASSWORD);

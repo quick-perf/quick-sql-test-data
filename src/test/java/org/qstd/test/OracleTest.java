@@ -31,7 +31,7 @@ public class OracleTest {
   private static DataSource DATA_SOURCE;
 
   private static final OracleContainer ORACLE_CONTAINER =
-      new OracleContainer("gvenzl/oracle-xe:18-slim").withEnv("ORACLE_PASSWORD", "oracle");
+      new OracleContainer("gvenzl/oracle-xe:21.3.0-slim").withEnv("ORACLE_PASSWORD", "oracle");
 
   private static SqlExecutor SQL_EXECUTOR;
 

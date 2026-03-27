@@ -28,8 +28,7 @@ import org.testcontainers.containers.MSSQLServerContainer;
 public class MSSQLServerTest {
 
   private static final MSSQLServerContainer MS_SQL_SERVER =
-      new MSSQLServerContainer("mcr.microsoft.com/mssql/server:2019-CU9-ubuntu-16.04")
-          .acceptLicense();
+      new MSSQLServerContainer<>("mcr.microsoft.com/mssql/server:2022-latest").acceptLicense();
 
   private static DataSource DATA_SOURCE;
 
