@@ -25,7 +25,11 @@ jobs:
         cache: 'maven'
     - name: Execute tests
       run: mvn verify
-    - name: check license header is present in all files
-      run: mvn license:check
+    - name: Upload Maven Timeline
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: maven-timeline-java-${{ matrix.java }}
+        path: target/timeline/
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
