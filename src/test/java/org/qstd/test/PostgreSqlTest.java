@@ -33,7 +33,7 @@ public class PostgreSqlTest {
   private static final String DB_PASSWORD = "pwd";
 
   private static final PostgreSQLContainer POSTGRESQL_CONTAINER =
-      new PostgreSQLContainer<>("postgres:12.3")
+      new PostgreSQLContainer<>("postgres:17")
           .withDatabaseName("postgresql")
           .withUsername(DB_USER_NAME)
           .withPassword(DB_PASSWORD);
